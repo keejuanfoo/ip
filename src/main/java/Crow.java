@@ -22,76 +22,84 @@ public class Crow {
         ArrayList<Task> tasks = new ArrayList<>();
 
         while (scanner.hasNextLine()) {
-            String command = scanner.nextLine();
+            String input = scanner.nextLine().trim();
+            String[] inputParts = input.split("\\s+", 2);
+            String commandWord = inputParts[0];
+            String arguments = inputParts.length > 1 ? inputParts[1].trim() : "";
+            CommandType commandType = CommandType.from(commandWord);
             System.out.println(separator);
 
-            if (command.equals("bye")) {
-                System.out.println(" Bye. Hope to see you again soon!");
-                System.out.println(separator);
-                break;
-            }
-
             try {
-                if (command.equals("list")) {
+                switch (commandType) {
+                case LIST:
                     System.out.println(" Here are the tasks in your list:");
                     for (int i = 0; i < tasks.size(); i++) {
                         System.out.println(" " + (i + 1) + "." + tasks.get(i));
                     }
-                } else if (command.equals("mark") || command.startsWith("mark ")) {
-                    int taskIndex = parseTaskIndex(command.substring(4), tasks.size());
+                    break;
+                case MARK:
+                    int taskIndex = parseTaskIndex(arguments, tasks.size());
                     tasks.get(taskIndex).markAsDone();
                     System.out.println(" Nice! I've marked this task as done:");
                     System.out.println("   " + tasks.get(taskIndex));
-                } else if (command.equals("unmark") || command.startsWith("unmark ")) {
-                    int taskIndex = parseTaskIndex(command.substring(6), tasks.size());
-                    tasks.get(taskIndex).markAsNotDone();
+                    break;
+                case UNMARK:
+                    int unmarkIndex = parseTaskIndex(arguments, tasks.size());
+                    tasks.get(unmarkIndex).markAsNotDone();
                     System.out.println(" OK, I've marked this task as not done yet:");
-                    System.out.println("   " + tasks.get(taskIndex));
-                } else if (command.equals("delete") || command.startsWith("delete ")) {
-                    int taskIndex = parseTaskIndex(command.substring(6), tasks.size());
-                    Task removedTask = tasks.remove(taskIndex);
+                    System.out.println("   " + tasks.get(unmarkIndex));
+                    break;
+                case DELETE:
+                    int deleteIndex = parseTaskIndex(arguments, tasks.size());
+                    Task removedTask = tasks.remove(deleteIndex);
                     System.out.println(" Noted. I've removed this task:");
                     System.out.println("   " + removedTask);
                     printTaskCount(tasks.size());
-                } else if (command.equals("todo") || command.startsWith("todo ")) {
-                    String description = command.substring(4).trim();
-                    if (description.isEmpty()) {
+                    break;
+                case TODO:
+                    if (arguments.isEmpty()) {
                         throw new CrowException("Error: Todo description cannot be empty.");
                     }
-                    Task task = new Todo(description);
-                    tasks.add(task);
-                    printTaskAdded(task, tasks.size());
-                } else if (command.equals("deadline") || command.startsWith("deadline ")) {
-                    String taskDetails = command.substring(8).trim();
-                    int byIndex = taskDetails.indexOf(" /by ");
-                    if (byIndex <= 0 || taskDetails.substring(byIndex + 5).trim().isEmpty()) {
+                    Task todo = new Todo(arguments);
+                    tasks.add(todo);
+                    printTaskAdded(todo, tasks.size());
+                    break;
+                case DEADLINE:
+                    int byIndex = arguments.indexOf(" /by ");
+                    if (byIndex <= 0 || arguments.substring(byIndex + 5).trim().isEmpty()) {
                         throw new CrowException("Error: Use deadline DESCRIPTION /by TIME.");
                     }
-                    String description = taskDetails.substring(0, byIndex).trim();
-                    String by = taskDetails.substring(byIndex + 5).trim();
-                    Task task = new Deadline(description, by);
-                    tasks.add(task);
-                    printTaskAdded(task, tasks.size());
-                } else if (command.equals("event") || command.startsWith("event ")) {
-                    String taskDetails = command.substring(5).trim();
-                    int fromIndex = taskDetails.indexOf(" /from ");
+                    String deadlineDescription = arguments.substring(0, byIndex).trim();
+                    String by = arguments.substring(byIndex + 5).trim();
+                    Task deadline = new Deadline(deadlineDescription, by);
+                    tasks.add(deadline);
+                    printTaskAdded(deadline, tasks.size());
+                    break;
+                case EVENT:
+                    int fromIndex = arguments.indexOf(" /from ");
                     if (fromIndex <= 0) {
                         throw new CrowException("Error: Use event DESCRIPTION /from START /to END.");
                     }
-                    int toIndex = taskDetails.indexOf(" /to ", fromIndex + 7);
+                    int toIndex = arguments.indexOf(" /to ", fromIndex + 7);
                     if (toIndex < 0) {
                         throw new CrowException("Error: Use event DESCRIPTION /from START /to END.");
                     }
-                    String description = taskDetails.substring(0, fromIndex).trim();
-                    String from = taskDetails.substring(fromIndex + 7, toIndex).trim();
-                    String to = taskDetails.substring(toIndex + 5).trim();
+                    String eventDescription = arguments.substring(0, fromIndex).trim();
+                    String from = arguments.substring(fromIndex + 7, toIndex).trim();
+                    String to = arguments.substring(toIndex + 5).trim();
                     if (from.isEmpty() || to.isEmpty()) {
                         throw new CrowException("Error: Use event DESCRIPTION /from START /to END.");
                     }
-                    Task task = new Event(description, from, to);
-                    tasks.add(task);
-                    printTaskAdded(task, tasks.size());
-                } else {
+                    Task event = new Event(eventDescription, from, to);
+                    tasks.add(event);
+                    printTaskAdded(event, tasks.size());
+                    break;
+                case BYE:
+                    System.out.println(" Bye. Hope to see you again soon!");
+                    System.out.println(separator);
+                    return;
+                case UNKNOWN:
+                default:
                     throw new CrowException("Error: Unknown command.");
                 }
             } catch (CrowException e) {
