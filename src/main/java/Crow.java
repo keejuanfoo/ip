@@ -48,10 +48,35 @@ public class Crow {
                 tasks[taskIndex].markAsNotDone();
                 System.out.println(" OK, I've marked this task as not done yet:");
                 System.out.println("   " + tasks[taskIndex]);
-            } else {
-                tasks[taskCount] = new Task(command);
+            } else if (command.startsWith("todo ")) {
+                String description = command.substring(5);
+                tasks[taskCount] = new Todo(description);
                 taskCount++;
-                System.out.println(" added: " + command);
+                System.out.println(" Got it. I've added this task:");
+                System.out.println("   " + tasks[taskCount - 1]);
+                System.out.println(" Now you have " + taskCount + " tasks in the list.");
+            } else if (command.startsWith("deadline ")) {
+                String taskDetails = command.substring(9);
+                int byIndex = taskDetails.indexOf(" /by ");
+                String description = taskDetails.substring(0, byIndex);
+                String by = taskDetails.substring(byIndex + 5);
+                tasks[taskCount] = new Deadline(description, by);
+                taskCount++;
+                System.out.println(" Got it. I've added this task:");
+                System.out.println("   " + tasks[taskCount - 1]);
+                System.out.println(" Now you have " + taskCount + " tasks in the list.");
+            } else if (command.startsWith("event ")) {
+                String taskDetails = command.substring(6);
+                int fromIndex = taskDetails.indexOf(" /from ");
+                int toIndex = taskDetails.indexOf(" /to ", fromIndex + 7);
+                String description = taskDetails.substring(0, fromIndex);
+                String from = taskDetails.substring(fromIndex + 7, toIndex);
+                String to = taskDetails.substring(toIndex + 5);
+                tasks[taskCount] = new Event(description, from, to);
+                taskCount++;
+                System.out.println(" Got it. I've added this task:");
+                System.out.println("   " + tasks[taskCount - 1]);
+                System.out.println(" Now you have " + taskCount + " tasks in the list.");
             }
 
             System.out.println(separator);
