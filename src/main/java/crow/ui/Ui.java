@@ -1,3 +1,7 @@
+package crow.ui;
+
+import crow.task.Task;
+
 import java.util.List;
 import java.util.Scanner;
 
