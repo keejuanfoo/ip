@@ -1,3 +1,4 @@
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -5,6 +6,9 @@ import java.util.Scanner;
  * Starts the CROW chatbot application.
  */
 public class Crow {
+    // relative to where the program is called
+    private static final Path DATA_FILE_PATH = Path.of("data", "crow.txt");
+
     public static void main(String[] args) {
         String separator = "_".repeat(60);
         String banner = "  ___  ____   __   _  _ \n"
@@ -19,7 +23,15 @@ public class Crow {
         System.out.println(separator);
 
         Scanner scanner = new Scanner(System.in);
-        ArrayList<Task> tasks = new ArrayList<>();
+        Storage storage = new Storage(DATA_FILE_PATH);
+        ArrayList<Task> tasks;
+        try {
+            tasks = storage.load();
+        } catch (CrowException e) {
+            System.out.println(" " + e.getMessage());
+            System.out.println(separator);
+            tasks = new ArrayList<>();
+        }
 
         while (scanner.hasNextLine()) {
             String input = scanner.nextLine().trim();
@@ -40,18 +52,21 @@ public class Crow {
                 case MARK:
                     int taskIndex = parseTaskIndex(arguments, tasks.size());
                     tasks.get(taskIndex).markAsDone();
+                    storage.save(tasks);
                     System.out.println(" Nice! I've marked this task as done:");
                     System.out.println("   " + tasks.get(taskIndex));
                     break;
                 case UNMARK:
                     int unmarkIndex = parseTaskIndex(arguments, tasks.size());
                     tasks.get(unmarkIndex).markAsNotDone();
+                    storage.save(tasks);
                     System.out.println(" OK, I've marked this task as not done yet:");
                     System.out.println("   " + tasks.get(unmarkIndex));
                     break;
                 case DELETE:
                     int deleteIndex = parseTaskIndex(arguments, tasks.size());
                     Task removedTask = tasks.remove(deleteIndex);
+                    storage.save(tasks);
                     System.out.println(" Noted. I've removed this task:");
                     System.out.println("   " + removedTask);
                     printTaskCount(tasks.size());
@@ -62,6 +77,7 @@ public class Crow {
                     }
                     Task todo = new Todo(arguments);
                     tasks.add(todo);
+                    storage.save(tasks);
                     printTaskAdded(todo, tasks.size());
                     break;
                 case DEADLINE:
@@ -73,6 +89,7 @@ public class Crow {
                     String by = arguments.substring(byIndex + 5).trim();
                     Task deadline = new Deadline(deadlineDescription, by);
                     tasks.add(deadline);
+                    storage.save(tasks);
                     printTaskAdded(deadline, tasks.size());
                     break;
                 case EVENT:
@@ -92,6 +109,7 @@ public class Crow {
                     }
                     Task event = new Event(eventDescription, from, to);
                     tasks.add(event);
+                    storage.save(tasks);
                     printTaskAdded(event, tasks.size());
                     break;
                 case BYE:

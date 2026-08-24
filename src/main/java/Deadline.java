@@ -15,6 +15,15 @@ public class Deadline extends Task {
         this.by = by;
     }
 
+    /**
+     * Returns the deadline as entered by the user.
+     *
+     * @return Deadline text.
+     */
+    public String getBy() {
+        return by;
+    }
+
     @Override
     public String toString() {
         return "[D]" + super.toString() + " (by: " + by + ")";
