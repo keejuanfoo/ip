@@ -1,4 +1,8 @@
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -8,6 +12,8 @@ import java.util.Scanner;
 public class Crow {
     // relative to where the program is called
     private static final Path DATA_FILE_PATH = Path.of("data", "crow.txt");
+    private static final DateTimeFormatter INPUT_DATE_TIME_FORMAT =
+            DateTimeFormatter.ofPattern("d/M/uuuu HHmm").withResolverStyle(ResolverStyle.STRICT);
 
     public static void main(String[] args) {
         String separator = "_".repeat(60);
@@ -83,10 +89,10 @@ public class Crow {
                 case DEADLINE:
                     int byIndex = arguments.indexOf(" /by ");
                     if (byIndex <= 0 || arguments.substring(byIndex + 5).trim().isEmpty()) {
-                        throw new CrowException("Error: Use deadline DESCRIPTION /by TIME.");
+                        throw new CrowException("Error: Use deadline DESCRIPTION /by d/M/yyyy HHmm.");
                     }
                     String deadlineDescription = arguments.substring(0, byIndex).trim();
-                    String by = arguments.substring(byIndex + 5).trim();
+                    LocalDateTime by = parseDateTime(arguments.substring(byIndex + 5).trim());
                     Task deadline = new Deadline(deadlineDescription, by);
                     tasks.add(deadline);
                     storage.save(tasks);
@@ -95,18 +101,23 @@ public class Crow {
                 case EVENT:
                     int fromIndex = arguments.indexOf(" /from ");
                     if (fromIndex <= 0) {
-                        throw new CrowException("Error: Use event DESCRIPTION /from START /to END.");
+                        throw new CrowException(
+                                "Error: Use event DESCRIPTION /from d/M/yyyy HHmm /to d/M/yyyy HHmm.");
                     }
                     int toIndex = arguments.indexOf(" /to ", fromIndex + 7);
                     if (toIndex < 0) {
-                        throw new CrowException("Error: Use event DESCRIPTION /from START /to END.");
+                        throw new CrowException(
+                                "Error: Use event DESCRIPTION /from d/M/yyyy HHmm /to d/M/yyyy HHmm.");
                     }
                     String eventDescription = arguments.substring(0, fromIndex).trim();
-                    String from = arguments.substring(fromIndex + 7, toIndex).trim();
-                    String to = arguments.substring(toIndex + 5).trim();
-                    if (from.isEmpty() || to.isEmpty()) {
-                        throw new CrowException("Error: Use event DESCRIPTION /from START /to END.");
+                    String fromInput = arguments.substring(fromIndex + 7, toIndex).trim();
+                    String toInput = arguments.substring(toIndex + 5).trim();
+                    if (fromInput.isEmpty() || toInput.isEmpty()) {
+                        throw new CrowException(
+                                "Error: Use event DESCRIPTION /from d/M/yyyy HHmm /to d/M/yyyy HHmm.");
                     }
+                    LocalDateTime from = parseDateTime(fromInput);
+                    LocalDateTime to = parseDateTime(toInput);
                     Task event = new Event(eventDescription, from, to);
                     tasks.add(event);
                     storage.save(tasks);
@@ -145,6 +156,21 @@ public class Crow {
             return taskIndex;
         } catch (NumberFormatException e) {
             throw new CrowException("Error: Enter a valid task number.");
+        }
+    }
+
+    /**
+     * Parses a date and time written in the format {@code d/M/yyyy HHmm}.
+     *
+     * @param input Date entered by the user.
+     * @return Parsed date and time.
+     * @throws CrowException If the date-time is absent, invalid, or in another format.
+     */
+    private static LocalDateTime parseDateTime(String input) throws CrowException {
+        try {
+            return LocalDateTime.parse(input, INPUT_DATE_TIME_FORMAT);
+        } catch (DateTimeParseException e) {
+            throw new CrowException("Error: Date and time must use d/M/yyyy HHmm format.");
         }
     }
 

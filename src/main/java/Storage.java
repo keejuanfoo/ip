@@ -2,6 +2,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,8 +95,8 @@ public class Storage {
         try {
             Task task = switch (parts[0]) {
             case "T" -> new Todo(parts[2]);
-            case "D" -> new Deadline(parts[2], parts[3]);
-            case "E" -> new Event(parts[2], parts[3], parts[4]);
+            case "D" -> new Deadline(parts[2], LocalDateTime.parse(parts[3]));
+            case "E" -> new Event(parts[2], LocalDateTime.parse(parts[3]), LocalDateTime.parse(parts[4]));
             default -> throw new CrowException("Error: Invalid task type in data file.");
             };
             if (parts[1].equals("1")) {
@@ -103,7 +105,7 @@ public class Storage {
                 throw new CrowException("Error: Invalid task status in data file.");
             }
             return task;
-        } catch (ArrayIndexOutOfBoundsException e) {
+        } catch (ArrayIndexOutOfBoundsException | DateTimeParseException e) {
             throw new CrowException("Error: Invalid task data in data file.");
         }
     }
