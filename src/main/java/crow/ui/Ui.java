@@ -2,6 +2,8 @@ package crow.ui;
 
 import crow.task.Task;
 
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.List;
 import java.util.Scanner;
 
@@ -16,22 +18,35 @@ public class Ui {
             + " \\___)(__\\_) \\__/ (_/\\_)";
 
     private final Scanner scanner;
+    private final PrintStream output;
 
     /**
      * Creates a UI that reads from standard input.
      */
     public Ui() {
-        scanner = new Scanner(System.in);
+        this(System.in, System.out);
+    }
+
+    /**
+     * Creates a UI using the supplied input and output streams.
+     * This constructor allows the UI to be tested without replacing the global console streams.
+     *
+     * @param input Stream from which commands are read.
+     * @param output Stream to which messages are written.
+     */
+    public Ui(InputStream input, PrintStream output) {
+        scanner = new Scanner(input);
+        this.output = output;
     }
 
     /**
      * Displays the chatbot banner and greeting.
      */
     public void showWelcome() {
-        System.out.println(SEPARATOR);
-        System.out.println(BANNER);
-        System.out.println("Hello! I'm Crow.");
-        System.out.println("What can I do for you?");
+        output.println(SEPARATOR);
+        output.println(BANNER);
+        output.println("Hello! I'm Crow.");
+        output.println("What can I do for you?");
         showSeparator();
     }
 
@@ -59,9 +74,9 @@ public class Ui {
      * @param tasks Tasks to display.
      */
     public void showTaskList(List<Task> tasks) {
-        System.out.println(" Here are the tasks in your list:");
+        output.println(" Here are the tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
-            System.out.println(" " + (i + 1) + "." + tasks.get(i));
+            output.println(" " + (i + 1) + "." + tasks.get(i));
         }
     }
 
@@ -71,8 +86,8 @@ public class Ui {
      * @param task Task that was marked.
      */
     public void showTaskMarked(Task task) {
-        System.out.println(" Nice! I've marked this task as done:");
-        System.out.println("   " + task);
+        output.println(" Nice! I've marked this task as done:");
+        output.println("   " + task);
     }
 
     /**
@@ -81,8 +96,8 @@ public class Ui {
      * @param task Task that was unmarked.
      */
     public void showTaskUnmarked(Task task) {
-        System.out.println(" OK, I've marked this task as not done yet:");
-        System.out.println("   " + task);
+        output.println(" OK, I've marked this task as not done yet:");
+        output.println("   " + task);
     }
 
     /**
@@ -92,8 +107,8 @@ public class Ui {
      * @param taskCount Number of tasks currently stored.
      */
     public void showTaskAdded(Task task, int taskCount) {
-        System.out.println(" Got it. I've added this task:");
-        System.out.println("   " + task);
+        output.println(" Got it. I've added this task:");
+        output.println("   " + task);
         showTaskCount(taskCount);
     }
 
@@ -104,8 +119,8 @@ public class Ui {
      * @param taskCount Number of tasks currently stored.
      */
     public void showTaskDeleted(Task task, int taskCount) {
-        System.out.println(" Noted. I've removed this task:");
-        System.out.println("   " + task);
+        output.println(" Noted. I've removed this task:");
+        output.println("   " + task);
         showTaskCount(taskCount);
     }
 
@@ -115,14 +130,14 @@ public class Ui {
      * @param message Error message to display.
      */
     public void showError(String message) {
-        System.out.println(" " + message);
+        output.println(" " + message);
     }
 
     /**
      * Displays the farewell message and closing separator.
      */
     public void showGoodbye() {
-        System.out.println(" Bye. Hope to see you again soon!");
+        output.println(" Bye. Hope to see you again soon!");
         showSeparator();
     }
 
@@ -130,7 +145,7 @@ public class Ui {
      * Displays a separator between user interactions.
      */
     public void showSeparator() {
-        System.out.println(SEPARATOR);
+        output.println(SEPARATOR);
     }
 
     /**
@@ -138,6 +153,6 @@ public class Ui {
      */
     private void showTaskCount(int taskCount) {
         String taskWord = taskCount == 1 ? "task" : "tasks";
-        System.out.println(" Now you have " + taskCount + " " + taskWord + " in the list.");
+        output.println(" Now you have " + taskCount + " " + taskWord + " in the list.");
     }
 }

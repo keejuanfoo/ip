@@ -27,7 +27,18 @@ public class Crow {
      * @param filePath Relative path of the task data file.
      */
     public Crow(Path filePath) {
-        ui = new Ui();
+        this(filePath, new Ui());
+    }
+
+    /**
+     * Creates a Crow chatbot with a supplied UI.
+     * This constructor allows callers to provide isolated input and output streams for testing.
+     *
+     * @param filePath Relative path of the task data file.
+     * @param ui User interface used for input and output.
+     */
+    public Crow(Path filePath, Ui ui) {
+        this.ui = ui;
         storage = new Storage(filePath);
         tasks = new TaskList();
     }
