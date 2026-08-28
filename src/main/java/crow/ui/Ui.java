@@ -146,6 +146,15 @@ public class Ui {
     }
 
     /**
+     * Displays a potentially multiline response from the command engine.
+     *
+     * @param response Response to display.
+     */
+    public void showResponse(String response) {
+        output.println(" " + response.replace("\n", "\n "));
+    }
+
+    /**
      * Displays the farewell message and closing separator.
      */
     public void showGoodbye() {

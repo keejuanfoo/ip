@@ -49,6 +49,15 @@ class MainTest {
     }
 
     @Test
+    void mainWindow_byeCommand_isRecognizedAsExitCommand() throws ReflectiveOperationException {
+        Method isExitCommand = MainWindow.class.getDeclaredMethod("isExitCommand", String.class);
+        isExitCommand.setAccessible(true);
+
+        assertTrue((boolean) isExitCommand.invoke(null, "bye"));
+        assertTrue((boolean) isExitCommand.invoke(null, "  BYE  "));
+    }
+
+    @Test
     void avatarImages_areAvailableOnClasspath() {
         assertNotNull(Main.class.getResource("/images/DaUser.png"));
         assertNotNull(Main.class.getResource("/images/DaCrow.png"));
