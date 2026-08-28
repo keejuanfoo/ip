@@ -1,7 +1,12 @@
 package crow.ui;
 
+import java.io.IOException;
+import java.util.Collections;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -13,47 +18,41 @@ import javafx.scene.layout.HBox;
  * Displays a chat message beside its sender's profile image.
  */
 public class DialogBox extends HBox {
-    private final Label text;
-    private final ImageView displayPicture;
+    @FXML
+    private Label dialog;
+    @FXML
+    private ImageView displayPicture;
 
     /**
-     * Creates a dialog box containing a message and profile image.
-     *
-     * @param message Message to display.
-     * @param image Sender's profile image.
+     * Loads the dialog layout and fills it with a message and profile image.
      */
-    public DialogBox(String message, Image image) {
-        text = new Label(message);
-        displayPicture = new ImageView(image);
+    private DialogBox(String text, Image image) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(
+                    MainWindow.class.getResource("/view/DialogBox.fxml"));
+            fxmlLoader.setController(this);
+            fxmlLoader.setRoot(this);
+            fxmlLoader.load();
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to load a dialog box.", e);
+        }
 
-        text.setWrapText(true);
-        displayPicture.setFitWidth(100.0);
-        displayPicture.setFitHeight(100.0);
-        this.setAlignment(Pos.TOP_RIGHT);
-
-        this.getChildren().addAll(text, displayPicture);
+        dialog.setText(text);
+        displayPicture.setImage(image);
     }
 
     /**
      * Creates a right-aligned dialog for a message sent by the user.
-     *
-     * @param message Message to display.
-     * @param image User's profile image.
-     * @return User dialog box.
      */
-    public static DialogBox getUserDialog(String message, Image image) {
-        return new DialogBox(message, image);
+    public static DialogBox getUserDialog(String text, Image image) {
+        return new DialogBox(text, image);
     }
 
     /**
      * Creates a left-aligned dialog for a response sent by Crow.
-     *
-     * @param message Message to display.
-     * @param image Crow's profile image.
-     * @return Crow dialog box.
      */
-    public static DialogBox getCrowDialog(String message, Image image) {
-        DialogBox dialogBox = new DialogBox(message, image);
+    public static DialogBox getCrowDialog(String text, Image image) {
+        DialogBox dialogBox = new DialogBox(text, image);
         dialogBox.flip();
         return dialogBox;
     }
@@ -62,9 +61,9 @@ public class DialogBox extends HBox {
      * Places the profile image on the left and the message on the right.
      */
     private void flip() {
-        this.setAlignment(Pos.TOP_LEFT);
-        ObservableList<Node> children = FXCollections.observableArrayList(this.getChildren());
-        FXCollections.reverse(children);
-        this.getChildren().setAll(children);
+        ObservableList<Node> children = FXCollections.observableArrayList(getChildren());
+        Collections.reverse(children);
+        getChildren().setAll(children);
+        setAlignment(Pos.TOP_LEFT);
     }
 }

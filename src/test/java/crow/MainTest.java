@@ -9,6 +9,7 @@ import java.lang.reflect.Modifier;
 import org.junit.jupiter.api.Test;
 
 import crow.ui.DialogBox;
+import crow.ui.MainWindow;
 import javafx.application.Application;
 import javafx.scene.layout.HBox;
 
@@ -43,13 +44,19 @@ class MainTest {
     }
 
     @Test
-    void main_hasUserInputHandler() throws NoSuchMethodException {
-        assertNotNull(Main.class.getDeclaredMethod("handleUserInput"));
+    void mainWindow_hasUserInputHandler() throws NoSuchMethodException {
+        assertNotNull(MainWindow.class.getDeclaredMethod("handleUserInput"));
     }
 
     @Test
     void avatarImages_areAvailableOnClasspath() {
         assertNotNull(Main.class.getResource("/images/DaUser.png"));
         assertNotNull(Main.class.getResource("/images/DaCrow.png"));
+    }
+
+    @Test
+    void fxmlViews_areAvailableOnClasspath() {
+        assertNotNull(Main.class.getResource("/view/MainWindow.fxml"));
+        assertNotNull(Main.class.getResource("/view/DialogBox.fxml"));
     }
 }
