@@ -1,6 +1,7 @@
 package crow;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -25,10 +26,29 @@ class CrowTest {
     Path tempDirectory;
 
     @Test
-    void getResponse_userInput_echoesWithCrowPrefix() {
+    void getResponse_taskCommands_updateAndPersistTasks() {
+        Path filePath = tempDirectory.resolve("crow.txt");
+        Crow crow = new Crow(filePath);
+
+        assertTrue(crow.getResponse("todo read book").contains("[T][ ] read book"));
+        assertTrue(crow.getResponse("deadline return book /by 2/12/2019 1800")
+                .contains("[D][ ] return book"));
+        assertTrue(crow.getResponse("mark 1").contains("[T][X] read book"));
+        assertTrue(crow.getResponse("find book").contains("1.[T][X] read book"));
+        assertTrue(crow.getResponse("delete 2").contains("return book"));
+
+        Crow reloadedCrow = new Crow(filePath);
+        String reloadedList = reloadedCrow.getResponse("list");
+        assertTrue(reloadedList.contains("1.[T][X] read book"));
+        assertFalse(reloadedList.contains("return book"));
+    }
+
+    @Test
+    void getResponse_invalidCommand_returnsError() {
         Crow crow = new Crow(tempDirectory.resolve("crow.txt"));
 
-        assertEquals("Crow heard: hello", crow.getResponse("hello"));
+        assertEquals("Error: Unknown command.", crow.getResponse("blah"));
+        assertEquals("Error: Todo description cannot be empty.", crow.getResponse("todo"));
     }
 
     @Test

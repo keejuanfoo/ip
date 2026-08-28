@@ -1,7 +1,10 @@
 package crow.ui;
 
 import crow.Crow;
+import crow.parser.CommandType;
+import crow.parser.Parser;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -58,5 +61,19 @@ public class MainWindow {
                 DialogBox.getUserDialog(input, userImage),
                 DialogBox.getCrowDialog(response, crowImage));
         userInput.clear();
+
+        if (isExitCommand(input)) {
+            Platform.exit();
+        }
+    }
+
+    /**
+     * Checks whether a command should close the JavaFX application.
+     *
+     * @param input User command.
+     * @return {@code true} when the command is {@code bye}.
+     */
+    private static boolean isExitCommand(String input) {
+        return Parser.parseCommandType(input) == CommandType.BYE;
     }
 }

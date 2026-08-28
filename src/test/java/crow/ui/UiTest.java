@@ -74,10 +74,12 @@ class UiTest {
     @Test
     void errorAndGoodbye_displayExpectedMessages() {
         ui.showError("Error: Unknown command.");
+        ui.showResponse("First line\nSecond line");
         ui.showGoodbye();
 
         String output = outputText();
         assertTrue(output.contains("Error: Unknown command."));
+        assertTrue(output.contains(" First line\n Second line"));
         assertTrue(output.contains("Bye. Hope to see you again soon!"));
         assertTrue(output.endsWith("____________________________________________________________\n"));
     }
