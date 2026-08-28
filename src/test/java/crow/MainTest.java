@@ -32,6 +32,22 @@ class MainTest {
     }
 
     @Test
+    void dialogBox_hasUserAndCrowFactoryMethods() throws NoSuchMethodException {
+        Method userFactory = DialogBox.class.getMethod(
+                "getUserDialog", String.class, javafx.scene.image.Image.class);
+        Method crowFactory = DialogBox.class.getMethod(
+                "getCrowDialog", String.class, javafx.scene.image.Image.class);
+
+        assertTrue(Modifier.isStatic(userFactory.getModifiers()));
+        assertTrue(Modifier.isStatic(crowFactory.getModifiers()));
+    }
+
+    @Test
+    void main_hasUserInputHandler() throws NoSuchMethodException {
+        assertNotNull(Main.class.getDeclaredMethod("handleUserInput"));
+    }
+
+    @Test
     void avatarImages_areAvailableOnClasspath() {
         assertNotNull(Main.class.getResource("/images/DaUser.png"));
         assertNotNull(Main.class.getResource("/images/DaCrow.png"));

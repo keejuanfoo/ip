@@ -25,6 +25,13 @@ class CrowTest {
     Path tempDirectory;
 
     @Test
+    void getResponse_userInput_echoesWithCrowPrefix() {
+        Crow crow = new Crow(tempDirectory.resolve("crow.txt"));
+
+        assertEquals("Crow heard: hello", crow.getResponse("hello"));
+    }
+
+    @Test
     void run_completeWorkflow_updatesOutputAndStorage() throws CrowException {
         Path filePath = tempDirectory.resolve("data").resolve("crow.txt");
         String input = "todo read book\n"

@@ -21,6 +21,7 @@ public class Main extends Application {
             this.getClass().getResourceAsStream("/images/DaUser.png"));
     private final Image crowImage = new Image(
             this.getClass().getResourceAsStream("/images/DaCrow.png"));
+    private final Crow crow = new Crow();
 
     private ScrollPane scrollPane;
     private VBox dialogContainer;
@@ -40,9 +41,6 @@ public class Main extends Application {
 
         userInput = new TextField();
         sendButton = new Button("Send");
-
-        DialogBox dialogBox = new DialogBox("Hello!", userImage);
-        dialogContainer.getChildren().add(dialogBox);
 
         AnchorPane mainLayout = new AnchorPane();
         mainLayout.getChildren().addAll(scrollPane, userInput, sendButton);
@@ -72,6 +70,23 @@ public class Main extends Application {
         AnchorPane.setLeftAnchor(userInput, 1.0);
         AnchorPane.setBottomAnchor(userInput, 1.0);
 
+        sendButton.setOnMouseClicked(event -> handleUserInput());
+        userInput.setOnAction(event -> handleUserInput());
+        dialogContainer.heightProperty().addListener(observable -> scrollPane.setVvalue(1.0));
+
         stage.show();
+    }
+
+    /**
+     * Adds the user's message and Crow's response to the dialog container,
+     * then clears the input field.
+     */
+    private void handleUserInput() {
+        String userText = userInput.getText();
+        String crowText = crow.getResponse(userText);
+        dialogContainer.getChildren().addAll(
+                DialogBox.getUserDialog(userText, userImage),
+                DialogBox.getCrowDialog(crowText, crowImage));
+        userInput.clear();
     }
 }

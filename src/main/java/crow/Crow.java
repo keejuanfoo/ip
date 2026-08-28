@@ -22,6 +22,13 @@ public class Crow {
     private TaskList tasks;
 
     /**
+     * Creates a Crow chatbot using the project-relative data file.
+     */
+    public Crow() {
+        this(DATA_FILE_PATH);
+    }
+
+    /**
      * Creates a Crow chatbot that saves tasks at the given path.
      *
      * @param filePath Relative path of the task data file.
@@ -120,6 +127,16 @@ public class Crow {
 
             ui.showSeparator();
         }
+    }
+
+    /**
+     * Generates a response for a message entered in the JavaFX interface.
+     *
+     * @param input User's message.
+     * @return Crow's response.
+     */
+    public String getResponse(String input) {
+        return "Crow heard: " + input;
     }
 
     /**
