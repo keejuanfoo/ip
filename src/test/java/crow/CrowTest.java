@@ -32,6 +32,7 @@ class CrowTest {
                 + "event meeting /from 3/12/2019 1400 /to 3/12/2019 1600\n"
                 + "mark 1\n"
                 + "unmark 1\n"
+                + "find book\n"
                 + "delete 2\n"
                 + "list\n"
                 + "blah\n"
@@ -46,6 +47,7 @@ class CrowTest {
         assertTrue(output.contains("[D][ ] return book (by: Dec 02 2019 6:00PM)"));
         assertTrue(output.contains("[E][ ] meeting (from: Dec 03 2019 2:00PM"));
         assertTrue(output.contains("Noted. I've removed this task:"));
+        assertTrue(output.contains("Here are the matching tasks in your list:"));
         assertTrue(output.contains("Error: Unknown command."));
         assertTrue(output.contains("Bye. Hope to see you again soon!"));
 

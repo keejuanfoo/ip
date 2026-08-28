@@ -75,6 +75,19 @@ class ParserTest {
     }
 
     @Test
+    void parseFindKeyword_nonEmptyKeyword_returnsKeyword() throws CrowException {
+        assertEquals("read book", Parser.parseFindKeyword("read book"));
+    }
+
+    @Test
+    void parseFindKeyword_emptyKeyword_throwsException() {
+        CrowException exception = assertThrows(CrowException.class,
+                () -> Parser.parseFindKeyword(""));
+
+        assertEquals("Error: Search keyword cannot be empty.", exception.getMessage());
+    }
+
+    @Test
     void parseTaskIndex_validOneBasedNumber_returnsZeroBasedIndex() throws CrowException {
         assertEquals(1, Parser.parseTaskIndex("2", 3));
     }

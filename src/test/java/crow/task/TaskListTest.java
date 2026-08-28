@@ -50,4 +50,26 @@ class TaskListTest {
         assertThrows(UnsupportedOperationException.class,
                 () -> taskList.asList().add(new Todo("return book")));
     }
+
+    @Test
+    void find_matchingKeyword_returnsMatchesInOriginalOrder() {
+        TaskList taskList = new TaskList();
+        Todo firstMatch = new Todo("read book");
+        Todo nonMatch = new Todo("buy bread");
+        Todo secondMatch = new Todo("return BOOK");
+        taskList.add(firstMatch);
+        taskList.add(nonMatch);
+        taskList.add(secondMatch);
+
+        List<Task> matches = taskList.find("book");
+
+        assertEquals(List.of(firstMatch, secondMatch), matches);
+    }
+
+    @Test
+    void find_noMatchingKeyword_returnsEmptyList() {
+        TaskList taskList = new TaskList(List.of(new Todo("buy bread")));
+
+        assertTrue(taskList.find("book").isEmpty());
+    }
 }

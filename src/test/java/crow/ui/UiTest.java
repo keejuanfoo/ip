@@ -53,6 +53,7 @@ class UiTest {
 
         ui.showTaskAdded(todo, 1);
         ui.showTaskList(List.of(todo));
+        ui.showMatchingTasks(List.of(todo));
         todo.markAsDone();
         ui.showTaskMarked(todo);
         todo.markAsNotDone();
@@ -63,6 +64,7 @@ class UiTest {
         assertTrue(output.contains("Got it. I've added this task:"));
         assertTrue(output.contains("Now you have 1 task in the list."));
         assertTrue(output.contains("1.[T][ ] read book"));
+        assertTrue(output.contains("Here are the matching tasks in your list:"));
         assertTrue(output.contains("Nice! I've marked this task as done:"));
         assertTrue(output.contains("OK, I've marked this task as not done yet:"));
         assertTrue(output.contains("Noted. I've removed this task:"));
