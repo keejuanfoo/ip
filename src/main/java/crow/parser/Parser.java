@@ -99,6 +99,20 @@ public class Parser {
     }
 
     /**
+     * Validates and returns a keyword used to search for tasks.
+     *
+     * @param arguments Search keyword.
+     * @return Validated search keyword.
+     * @throws CrowException If the keyword is empty.
+     */
+    public static String parseFindKeyword(String arguments) throws CrowException {
+        if (arguments.isEmpty()) {
+            throw new CrowException("Error: Search keyword cannot be empty.");
+        }
+        return arguments;
+    }
+
+    /**
      * Converts a user-provided task number into a valid list index.
      *
      * @param input User-provided task number.

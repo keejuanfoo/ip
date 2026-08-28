@@ -9,6 +9,7 @@ class CommandTypeTest {
     void from_knownCommand_isCaseInsensitive() {
         assertEquals(CommandType.DEADLINE, CommandType.from("deadline"));
         assertEquals(CommandType.DEADLINE, CommandType.from("dEADline"));
+        assertEquals(CommandType.FIND, CommandType.from("find"));
         assertEquals(CommandType.BYE, CommandType.from("BYE"));
     }
 

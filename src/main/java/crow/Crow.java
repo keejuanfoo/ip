@@ -67,6 +67,10 @@ public class Crow {
                 case LIST:
                     ui.showTaskList(tasks.asList());
                     break;
+                case FIND:
+                    String keyword = Parser.parseFindKeyword(arguments);
+                    ui.showMatchingTasks(tasks.find(keyword));
+                    break;
                 case MARK:
                     int taskIndex = Parser.parseTaskIndex(arguments, tasks.size());
                     tasks.mark(taskIndex);

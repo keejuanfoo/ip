@@ -10,6 +10,7 @@ public enum CommandType {
     DEADLINE,
     EVENT,
     LIST,
+    FIND,
     MARK,
     UNMARK,
     DELETE,
