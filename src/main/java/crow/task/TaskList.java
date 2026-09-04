@@ -80,13 +80,9 @@ public class TaskList {
     public List<Task> find(String keyword) {
         assert keyword != null && !keyword.isBlank() : "Search keyword must not be blank";
         String normalizedKeyword = keyword.toLowerCase(Locale.ROOT);
-        ArrayList<Task> matchingTasks = new ArrayList<>();
-        for (Task task : tasks) {
-            if (task.getDescription().toLowerCase(Locale.ROOT).contains(normalizedKeyword)) {
-                matchingTasks.add(task);
-            }
-        }
-        return matchingTasks;
+        return tasks.stream()
+                .filter(task -> task.getDescription().toLowerCase(Locale.ROOT).contains(normalizedKeyword))
+                .toList();
     }
 
     /**

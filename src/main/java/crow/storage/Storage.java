@@ -62,10 +62,9 @@ public class Storage {
      * @throws CrowException If the tasks cannot be saved.
      */
     public void save(List<Task> tasks) throws CrowException {
-        ArrayList<String> taskDataLines = new ArrayList<>();
-        for (Task task : tasks) {
-            taskDataLines.add(formatTask(task));
-        }
+        List<String> taskDataLines = tasks.stream()
+                .map(this::formatTask)
+                .toList();
 
         try {
             Path parentDirectory = filePath.getParent();
