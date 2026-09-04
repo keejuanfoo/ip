@@ -61,9 +61,9 @@ class TaskListTest {
         taskList.add(nonMatch);
         taskList.add(secondMatch);
 
-        List<Task> matches = taskList.find("book");
+        List<Task> matchingTasks = taskList.find("book");
 
-        assertEquals(List.of(firstMatch, secondMatch), matches);
+        assertEquals(List.of(firstMatch, secondMatch), matchingTasks);
     }
 
     @Test

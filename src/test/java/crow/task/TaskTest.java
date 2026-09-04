@@ -35,21 +35,21 @@ class TaskTest {
 
     @Test
     void deadline_toString_formatsDateTime() {
-        LocalDateTime by = LocalDateTime.of(2019, 12, 2, 18, 0);
-        Deadline deadline = new Deadline("return book", by);
+        LocalDateTime deadlineDateTime = LocalDateTime.of(2019, 12, 2, 18, 0);
+        Deadline deadline = new Deadline("return book", deadlineDateTime);
 
-        assertEquals(by, deadline.getBy());
+        assertEquals(deadlineDateTime, deadline.getDeadlineDateTime());
         assertEquals("[D][ ] return book (by: Dec 02 2019 6:00PM)", deadline.toString());
     }
 
     @Test
     void event_toString_formatsStartAndEnd() {
-        LocalDateTime from = LocalDateTime.of(2019, 12, 3, 14, 0);
-        LocalDateTime to = LocalDateTime.of(2019, 12, 3, 16, 0);
-        Event event = new Event("meeting", from, to);
+        LocalDateTime startDateTime = LocalDateTime.of(2019, 12, 3, 14, 0);
+        LocalDateTime endDateTime = LocalDateTime.of(2019, 12, 3, 16, 0);
+        Event event = new Event("meeting", startDateTime, endDateTime);
 
-        assertEquals(from, event.getFrom());
-        assertEquals(to, event.getTo());
+        assertEquals(startDateTime, event.getStartDateTime());
+        assertEquals(endDateTime, event.getEndDateTime());
         assertEquals("[E][ ] meeting (from: Dec 03 2019 2:00PM to: Dec 03 2019 4:00PM)",
                 event.toString());
     }

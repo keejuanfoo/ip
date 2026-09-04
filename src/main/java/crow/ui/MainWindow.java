@@ -6,7 +6,6 @@ import crow.parser.Parser;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -26,10 +25,7 @@ public class MainWindow {
     @FXML
     private VBox dialogContainer;
     @FXML
-    private TextField userInput;
-    @FXML
-    private Button sendButton;
-
+    private TextField userInputField;
     private Crow crow;
 
     /**
@@ -55,14 +51,14 @@ public class MainWindow {
      */
     @FXML
     private void handleUserInput() {
-        String input = userInput.getText();
-        String response = crow.getResponse(input);
+        String userCommand = userInputField.getText();
+        String crowResponse = crow.getResponse(userCommand);
         dialogContainer.getChildren().addAll(
-                DialogBox.getUserDialog(input, userImage),
-                DialogBox.getCrowDialog(response, crowImage));
-        userInput.clear();
+                DialogBox.createUserDialog(userCommand, userImage),
+                DialogBox.createCrowDialog(crowResponse, crowImage));
+        userInputField.clear();
 
-        if (isExitCommand(input)) {
+        if (isExitCommand(userCommand)) {
             Platform.exit();
         }
     }
@@ -70,10 +66,10 @@ public class MainWindow {
     /**
      * Checks whether a command should close the JavaFX application.
      *
-     * @param input User command.
+     * @param command User command.
      * @return {@code true} when the command is {@code bye}.
      */
-    private static boolean isExitCommand(String input) {
-        return Parser.parseCommandType(input) == CommandType.BYE;
+    private static boolean isExitCommand(String command) {
+        return Parser.parseCommandType(command) == CommandType.BYE;
     }
 }

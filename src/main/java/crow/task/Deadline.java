@@ -1,27 +1,22 @@
 package crow.task;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 /**
  * Represents a task that must be completed by a specific date or time.
  */
 public class Deadline extends Task {
-    private static final DateTimeFormatter DISPLAY_FORMAT =
-            DateTimeFormatter.ofPattern("MMM dd yyyy h:mma", Locale.ENGLISH);
-
-    protected LocalDateTime by;
+    private final LocalDateTime deadlineDateTime;
 
     /**
      * Creates a deadline task.
      *
      * @param description Description of the task.
-     * @param by Date and time by which the task must be completed.
+     * @param deadlineDateTime Date and time by which the task must be completed.
      */
-    public Deadline(String description, LocalDateTime by) {
+    public Deadline(String description, LocalDateTime deadlineDateTime) {
         super(description);
-        this.by = by;
+        this.deadlineDateTime = deadlineDateTime;
     }
 
     /**
@@ -29,12 +24,13 @@ public class Deadline extends Task {
      *
      * @return Deadline date and time.
      */
-    public LocalDateTime getBy() {
-        return by;
+    public LocalDateTime getDeadlineDateTime() {
+        return deadlineDateTime;
     }
 
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " + by.format(DISPLAY_FORMAT) + ")";
+        return "[D]" + super.toString()
+                + " (by: " + deadlineDateTime.format(DISPLAY_DATE_TIME_FORMAT) + ")";
     }
 }
