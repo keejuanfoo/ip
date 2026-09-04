@@ -52,6 +52,34 @@ class CrowTest {
     }
 
     @Test
+    void getResponse_listCommand_automaticallyGroupsSortsAndPersistsTasks() {
+        Path filePath = tempDirectory.resolve("crow.txt");
+        Crow crow = new Crow(filePath);
+        crow.getResponse("event dinner /from 6/9/2026 1900 /to 6/9/2026 2100");
+        crow.getResponse("deadline report /by 5/9/2026 1800");
+        crow.getResponse("todo visit zoo");
+        crow.getResponse("todo borrow book");
+        crow.getResponse("event meeting /from 5/9/2026 1000 /to 5/9/2026 1100");
+        crow.getResponse("deadline assignment /by 4/9/2026 1800");
+
+        String sortedResponse = crow.getResponse("list");
+
+        assertTrue(sortedResponse.contains("ToDos:\n1.[T][ ] borrow book"));
+        assertTrue(sortedResponse.contains("1.[T][ ] borrow book"));
+        assertTrue(sortedResponse.contains("2.[T][ ] visit zoo"));
+        assertTrue(sortedResponse.contains("--------------------\nDeadlines:"));
+        assertTrue(sortedResponse.contains("3.[D][ ] assignment"));
+        assertTrue(sortedResponse.contains("4.[D][ ] report"));
+        assertTrue(sortedResponse.contains("--------------------\nEvents:"));
+        assertTrue(sortedResponse.contains("5.[E][ ] meeting"));
+        assertTrue(sortedResponse.contains("6.[E][ ] dinner"));
+
+        String reloadedList = new Crow(filePath).getResponse("list");
+        assertTrue(reloadedList.contains("1.[T][ ] borrow book"));
+        assertTrue(reloadedList.contains("6.[E][ ] dinner"));
+    }
+
+    @Test
     void run_completeWorkflow_updatesOutputAndStorage() throws CrowException {
         Path filePath = tempDirectory.resolve("data").resolve("crow.txt");
         String input = "todo read book\n"
