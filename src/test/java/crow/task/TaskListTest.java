@@ -61,9 +61,9 @@ class TaskListTest {
         taskList.add(nonMatch);
         taskList.add(secondMatch);
 
-        List<Task> matches = taskList.find("book");
+        List<Task> matchingTasks = taskList.find("book");
 
-        assertEquals(List.of(firstMatch, secondMatch), matches);
+        assertEquals(List.of(firstMatch, secondMatch), matchingTasks);
     }
 
     @Test
@@ -71,5 +71,14 @@ class TaskListTest {
         TaskList taskList = new TaskList(List.of(new Todo("buy bread")));
 
         assertTrue(taskList.find("book").isEmpty());
+    }
+
+    @Test
+    void internalOperations_invalidArguments_triggerAssertions() {
+        TaskList taskList = new TaskList();
+
+        assertThrows(AssertionError.class, () -> taskList.add(null));
+        assertThrows(AssertionError.class, () -> taskList.find(" "));
+        assertThrows(AssertionError.class, () -> taskList.mark(0));
     }
 }

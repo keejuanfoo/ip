@@ -11,9 +11,9 @@
          xmlns="http://javafx.com/javafx/17"
          xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <Label fx:id="dialog" minHeight="-Infinity" wrapText="true"
+        <Label fx:id="dialogLabel" minHeight="-Infinity" wrapText="true"
                HBox.hgrow="ALWAYS" />
-        <ImageView fx:id="displayPicture" fitHeight="72.0" fitWidth="72.0"
+        <ImageView fx:id="avatarImageView" fitHeight="72.0" fitWidth="72.0"
                    pickOnBounds="true" preserveRatio="true" />
     </children>
     <padding>

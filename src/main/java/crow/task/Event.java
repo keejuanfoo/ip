@@ -1,30 +1,25 @@
 package crow.task;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 /**
  * Represents a task that occurs between a start and end date or time.
  */
 public class Event extends Task {
-    private static final DateTimeFormatter DISPLAY_FORMAT =
-            DateTimeFormatter.ofPattern("MMM dd yyyy h:mma", Locale.ENGLISH);
-
-    protected LocalDateTime from;
-    protected LocalDateTime to;
+    private final LocalDateTime startDateTime;
+    private final LocalDateTime endDateTime;
 
     /**
      * Creates an event task.
      *
      * @param description Description of the event.
-     * @param from Start date and time.
-     * @param to End date and time.
+     * @param startDateTime Start date and time.
+     * @param endDateTime End date and time.
      */
-    public Event(String description, LocalDateTime from, LocalDateTime to) {
+    public Event(String description, LocalDateTime startDateTime, LocalDateTime endDateTime) {
         super(description);
-        this.from = from;
-        this.to = to;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
     }
 
     /**
@@ -32,8 +27,8 @@ public class Event extends Task {
      *
      * @return Start date and time.
      */
-    public LocalDateTime getFrom() {
-        return from;
+    public LocalDateTime getStartDateTime() {
+        return startDateTime;
     }
 
     /**
@@ -41,13 +36,14 @@ public class Event extends Task {
      *
      * @return End date and time.
      */
-    public LocalDateTime getTo() {
-        return to;
+    public LocalDateTime getEndDateTime() {
+        return endDateTime;
     }
 
     @Override
     public String toString() {
-        return "[E]" + super.toString() + " (from: " + from.format(DISPLAY_FORMAT)
-                + " to: " + to.format(DISPLAY_FORMAT) + ")";
+        return "[E]" + super.toString()
+                + " (from: " + startDateTime.format(DISPLAY_DATE_TIME_FORMAT)
+                + " to: " + endDateTime.format(DISPLAY_DATE_TIME_FORMAT) + ")";
     }
 }

@@ -35,9 +35,9 @@ class MainTest {
     @Test
     void dialogBox_hasUserAndCrowFactoryMethods() throws NoSuchMethodException {
         Method userFactory = DialogBox.class.getMethod(
-                "getUserDialog", String.class, javafx.scene.image.Image.class);
+                "createUserDialog", String.class, javafx.scene.image.Image.class);
         Method crowFactory = DialogBox.class.getMethod(
-                "getCrowDialog", String.class, javafx.scene.image.Image.class);
+                "createCrowDialog", String.class, javafx.scene.image.Image.class);
 
         assertTrue(Modifier.isStatic(userFactory.getModifiers()));
         assertTrue(Modifier.isStatic(crowFactory.getModifiers()));
