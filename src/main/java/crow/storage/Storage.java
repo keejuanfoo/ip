@@ -82,6 +82,8 @@ public class Storage {
      * Converts one task into its file representation.
      */
     private String formatTask(Task task) {
+        assert task instanceof Todo || task instanceof Deadline || task instanceof Event
+                : "Storage supports only Todo, Deadline, and Event tasks";
         String completionStatus = task.isDone() ? "1" : "0";
         if (task instanceof Deadline deadline) {
             return "D | " + completionStatus + " | " + task.getDescription()

@@ -24,6 +24,8 @@ public class TaskList {
      * @param tasks Initial tasks.
      */
     public TaskList(List<Task> tasks) {
+        assert tasks != null : "Initial task list must not be null";
+        assert containsNoNullTasks(tasks) : "Initial task list must not contain null tasks";
         this.tasks = new ArrayList<>(tasks);
     }
 
@@ -33,6 +35,7 @@ public class TaskList {
      * @param task Task to add.
      */
     public void add(Task task) {
+        assert task != null : "Task to add must not be null";
         tasks.add(task);
     }
 
@@ -43,6 +46,7 @@ public class TaskList {
      * @return Removed task.
      */
     public Task delete(int index) {
+        assert isValidIndex(index) : "Task index must be within the list";
         return tasks.remove(index);
     }
 
@@ -52,6 +56,7 @@ public class TaskList {
      * @param index Zero-based index of the task.
      */
     public void mark(int index) {
+        assert isValidIndex(index) : "Task index must be within the list";
         tasks.get(index).markAsDone();
     }
 
@@ -61,6 +66,7 @@ public class TaskList {
      * @param index Zero-based index of the task.
      */
     public void unmark(int index) {
+        assert isValidIndex(index) : "Task index must be within the list";
         tasks.get(index).markAsNotDone();
     }
 
@@ -72,6 +78,7 @@ public class TaskList {
      * @return Matching tasks in their original list order.
      */
     public List<Task> find(String keyword) {
+        assert keyword != null && !keyword.isBlank() : "Search keyword must not be blank";
         String normalizedKeyword = keyword.toLowerCase(Locale.ROOT);
         ArrayList<Task> matchingTasks = new ArrayList<>();
         for (Task task : tasks) {
@@ -89,6 +96,7 @@ public class TaskList {
      * @return Task at the index.
      */
     public Task get(int index) {
+        assert isValidIndex(index) : "Task index must be within the list";
         return tasks.get(index);
     }
 
@@ -108,5 +116,24 @@ public class TaskList {
      */
     public List<Task> asList() {
         return Collections.unmodifiableList(tasks);
+    }
+
+    /**
+     * Checks whether an index identifies a task in the list.
+     */
+    private boolean isValidIndex(int index) {
+        return index >= 0 && index < tasks.size();
+    }
+
+    /**
+     * Checks that every element in an initial task collection is present.
+     */
+    private static boolean containsNoNullTasks(List<Task> tasks) {
+        for (Task task : tasks) {
+            if (task == null) {
+                return false;
+            }
+        }
+        return true;
     }
 }
