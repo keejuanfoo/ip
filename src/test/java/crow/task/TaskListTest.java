@@ -72,4 +72,13 @@ class TaskListTest {
 
         assertTrue(taskList.find("book").isEmpty());
     }
+
+    @Test
+    void internalOperations_invalidArguments_triggerAssertions() {
+        TaskList taskList = new TaskList();
+
+        assertThrows(AssertionError.class, () -> taskList.add(null));
+        assertThrows(AssertionError.class, () -> taskList.find(" "));
+        assertThrows(AssertionError.class, () -> taskList.mark(0));
+    }
 }
