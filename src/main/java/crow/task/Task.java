@@ -1,11 +1,17 @@
 package crow.task;
 
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 /**
  * Represents a task and whether it has been completed.
  */
 public class Task {
-    protected String description;
-    protected boolean isDone;
+    static final DateTimeFormatter DISPLAY_DATE_TIME_FORMAT =
+            DateTimeFormatter.ofPattern("MMM dd yyyy h:mma", Locale.ENGLISH);
+
+    private final String description;
+    private boolean isDone;
 
     /**
      * Creates a task with the given description.

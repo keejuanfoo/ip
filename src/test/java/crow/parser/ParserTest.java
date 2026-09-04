@@ -45,7 +45,7 @@ class ParserTest {
         Deadline deadline = Parser.parseDeadline("return book /by 2/12/2019 1800");
 
         assertEquals("return book", deadline.getDescription());
-        assertEquals(LocalDateTime.of(2019, 12, 2, 18, 0), deadline.getBy());
+        assertEquals(LocalDateTime.of(2019, 12, 2, 18, 0), deadline.getDeadlineDateTime());
     }
 
     @Test
@@ -64,8 +64,8 @@ class ParserTest {
         Event event = Parser.parseEvent("meeting /from 3/12/2019 1400 /to 3/12/2019 1600");
 
         assertEquals("meeting", event.getDescription());
-        assertEquals(LocalDateTime.of(2019, 12, 3, 14, 0), event.getFrom());
-        assertEquals(LocalDateTime.of(2019, 12, 3, 16, 0), event.getTo());
+        assertEquals(LocalDateTime.of(2019, 12, 3, 14, 0), event.getStartDateTime());
+        assertEquals(LocalDateTime.of(2019, 12, 3, 16, 0), event.getEndDateTime());
     }
 
     @Test

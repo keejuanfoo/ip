@@ -23,7 +23,7 @@ public enum CommandType {
      * @param commandWord First word entered by the user.
      * @return Matching command type, or {@link #UNKNOWN} if there is no match.
      */
-    public static CommandType from(String commandWord) {
+    public static CommandType parseCommandWord(String commandWord) {
         try {
             return valueOf(commandWord.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {

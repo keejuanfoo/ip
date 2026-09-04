@@ -44,9 +44,9 @@ public class Storage {
         }
 
         try {
-            for (String line : Files.readAllLines(filePath, StandardCharsets.UTF_8)) {
-                if (!line.isBlank()) {
-                    tasks.add(parseTask(line));
+            for (String taskDataLine : Files.readAllLines(filePath, StandardCharsets.UTF_8)) {
+                if (!taskDataLine.isBlank()) {
+                    tasks.add(parseTask(taskDataLine));
                 }
             }
             return tasks;
@@ -62,9 +62,9 @@ public class Storage {
      * @throws CrowException If the tasks cannot be saved.
      */
     public void save(List<Task> tasks) throws CrowException {
-        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> taskDataLines = new ArrayList<>();
         for (Task task : tasks) {
-            lines.add(formatTask(task));
+            taskDataLines.add(formatTask(task));
         }
 
         try {
@@ -72,7 +72,7 @@ public class Storage {
             if (parentDirectory != null) {
                 Files.createDirectories(parentDirectory);
             }
-            Files.write(filePath, lines, StandardCharsets.UTF_8);
+            Files.write(filePath, taskDataLines, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new CrowException("Error: Unable to save tasks.");
         }
@@ -82,15 +82,16 @@ public class Storage {
      * Converts one task into its file representation.
      */
     private String formatTask(Task task) {
-        String status = task.isDone() ? "1" : "0";
+        String completionStatus = task.isDone() ? "1" : "0";
         if (task instanceof Deadline deadline) {
-            return "D | " + status + " | " + task.getDescription() + " | " + deadline.getBy();
+            return "D | " + completionStatus + " | " + task.getDescription()
+                    + " | " + deadline.getDeadlineDateTime();
         }
         if (task instanceof Event event) {
-            return "E | " + status + " | " + task.getDescription()
-                    + " | " + event.getFrom() + " | " + event.getTo();
+            return "E | " + completionStatus + " | " + task.getDescription()
+                    + " | " + event.getStartDateTime() + " | " + event.getEndDateTime();
         }
-        return "T | " + status + " | " + task.getDescription();
+        return "T | " + completionStatus + " | " + task.getDescription();
     }
 
     /**
@@ -98,18 +99,19 @@ public class Storage {
      *
      * @throws CrowException If the line has an unsupported format.
      */
-    private Task parseTask(String line) throws CrowException {
-        String[] parts = line.split(" \\| ", -1);
+    private Task parseTask(String taskDataLine) throws CrowException {
+        String[] taskFields = taskDataLine.split(" \\| ", -1);
         try {
-            Task task = switch (parts[0]) {
-            case "T" -> new Todo(parts[2]);
-            case "D" -> new Deadline(parts[2], LocalDateTime.parse(parts[3]));
-            case "E" -> new Event(parts[2], LocalDateTime.parse(parts[3]), LocalDateTime.parse(parts[4]));
+            Task task = switch (taskFields[0]) {
+            case "T" -> new Todo(taskFields[2]);
+            case "D" -> new Deadline(taskFields[2], LocalDateTime.parse(taskFields[3]));
+            case "E" -> new Event(taskFields[2], LocalDateTime.parse(taskFields[3]),
+                    LocalDateTime.parse(taskFields[4]));
             default -> throw new CrowException("Error: Invalid task type in data file.");
             };
-            if (parts[1].equals("1")) {
+            if (taskFields[1].equals("1")) {
                 task.markAsDone();
-            } else if (!parts[1].equals("0")) {
+            } else if (!taskFields[1].equals("0")) {
                 throw new CrowException("Error: Invalid task status in data file.");
             }
             return task;

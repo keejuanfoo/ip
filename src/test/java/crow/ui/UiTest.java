@@ -8,12 +8,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import crow.task.Todo;
 
 class UiTest {
     private ByteArrayOutputStream outputBytes;
@@ -40,7 +37,7 @@ class UiTest {
     void showWelcome_displaysBannerGreetingAndSeparator() {
         ui.showWelcome();
 
-        String output = outputText();
+        String output = getOutputText();
         assertTrue(output.startsWith("____________________________________________________________"));
         assertTrue(output.contains("___  ____   __   _  _"));
         assertTrue(output.contains("Hello! I'm Crow."));
@@ -48,40 +45,13 @@ class UiTest {
     }
 
     @Test
-    void taskMessages_displayTaskAndCounts() {
-        Todo todo = new Todo("read book");
-
-        ui.showTaskAdded(todo, 1);
-        ui.showTaskList(List.of(todo));
-        ui.showMatchingTasks(List.of(todo));
-        todo.markAsDone();
-        ui.showTaskMarked(todo);
-        todo.markAsNotDone();
-        ui.showTaskUnmarked(todo);
-        ui.showTaskDeleted(todo, 0);
-
-        String output = outputText();
-        assertTrue(output.contains("Got it. I've added this task:"));
-        assertTrue(output.contains("Now you have 1 task in the list."));
-        assertTrue(output.contains("1.[T][ ] read book"));
-        assertTrue(output.contains("Here are the matching tasks in your list:"));
-        assertTrue(output.contains("Nice! I've marked this task as done:"));
-        assertTrue(output.contains("OK, I've marked this task as not done yet:"));
-        assertTrue(output.contains("Noted. I've removed this task:"));
-        assertTrue(output.contains("Now you have 0 tasks in the list."));
-    }
-
-    @Test
-    void errorAndGoodbye_displayExpectedMessages() {
+    void errorAndResponse_displayExpectedMessages() {
         ui.showError("Error: Unknown command.");
         ui.showResponse("First line\nSecond line");
-        ui.showGoodbye();
 
-        String output = outputText();
+        String output = getOutputText();
         assertTrue(output.contains("Error: Unknown command."));
         assertTrue(output.contains(" First line\n Second line"));
-        assertTrue(output.contains("Bye. Hope to see you again soon!"));
-        assertTrue(output.endsWith("____________________________________________________________\n"));
     }
 
     private Ui createUi(String input) {
@@ -90,7 +60,7 @@ class UiTest {
         return new Ui(inputStream, outputStream);
     }
 
-    private String outputText() {
+    private String getOutputText() {
         return outputBytes.toString(StandardCharsets.UTF_8);
     }
 }

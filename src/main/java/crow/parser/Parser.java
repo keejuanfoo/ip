@@ -14,6 +14,9 @@ import java.time.format.ResolverStyle;
  * Interprets user input and converts command arguments into program data.
  */
 public class Parser {
+    private static final String DEADLINE_SEPARATOR = " /by ";
+    private static final String EVENT_START_SEPARATOR = " /from ";
+    private static final String EVENT_END_SEPARATOR = " /to ";
     private static final DateTimeFormatter INPUT_DATE_TIME_FORMAT =
             DateTimeFormatter.ofPattern("d/M/uuuu HHmm").withResolverStyle(ResolverStyle.STRICT);
 
@@ -25,7 +28,7 @@ public class Parser {
      */
     public static CommandType parseCommandType(String input) {
         String[] inputParts = input.trim().split("\\s+", 2);
-        return CommandType.from(inputParts[0]);
+        return CommandType.parseCommandWord(inputParts[0]);
     }
 
     /**
@@ -61,13 +64,14 @@ public class Parser {
      * @throws CrowException If the arguments are incomplete or invalid.
      */
     public static Deadline parseDeadline(String arguments) throws CrowException {
-        int byIndex = arguments.indexOf(" /by ");
-        if (byIndex <= 0 || arguments.substring(byIndex + 5).trim().isEmpty()) {
+        int deadlineSeparatorIndex = arguments.indexOf(DEADLINE_SEPARATOR);
+        int dateTimeStartIndex = deadlineSeparatorIndex + DEADLINE_SEPARATOR.length();
+        if (deadlineSeparatorIndex <= 0 || arguments.substring(dateTimeStartIndex).trim().isEmpty()) {
             throw new CrowException("Error: Use deadline DESCRIPTION /by d/M/yyyy HHmm.");
         }
-        String description = arguments.substring(0, byIndex).trim();
-        LocalDateTime by = parseDateTime(arguments.substring(byIndex + 5).trim());
-        return new Deadline(description, by);
+        String description = arguments.substring(0, deadlineSeparatorIndex).trim();
+        LocalDateTime deadlineDateTime = parseDateTime(arguments.substring(dateTimeStartIndex).trim());
+        return new Deadline(description, deadlineDateTime);
     }
 
     /**
@@ -78,24 +82,26 @@ public class Parser {
      * @throws CrowException If the arguments are incomplete or invalid.
      */
     public static Event parseEvent(String arguments) throws CrowException {
-        int fromIndex = arguments.indexOf(" /from ");
-        if (fromIndex <= 0) {
-            throw invalidEventFormat();
+        int startSeparatorIndex = arguments.indexOf(EVENT_START_SEPARATOR);
+        if (startSeparatorIndex <= 0) {
+            throw createInvalidEventFormatException();
         }
-        int toIndex = arguments.indexOf(" /to ", fromIndex + 7);
-        if (toIndex < 0) {
-            throw invalidEventFormat();
+        int startDateTimeIndex = startSeparatorIndex + EVENT_START_SEPARATOR.length();
+        int endSeparatorIndex = arguments.indexOf(EVENT_END_SEPARATOR, startDateTimeIndex);
+        if (endSeparatorIndex < 0) {
+            throw createInvalidEventFormatException();
         }
 
-        String description = arguments.substring(0, fromIndex).trim();
-        String fromInput = arguments.substring(fromIndex + 7, toIndex).trim();
-        String toInput = arguments.substring(toIndex + 5).trim();
-        if (fromInput.isEmpty() || toInput.isEmpty()) {
-            throw invalidEventFormat();
+        String description = arguments.substring(0, startSeparatorIndex).trim();
+        String startDateTimeInput = arguments.substring(startDateTimeIndex, endSeparatorIndex).trim();
+        String endDateTimeInput = arguments.substring(
+                endSeparatorIndex + EVENT_END_SEPARATOR.length()).trim();
+        if (startDateTimeInput.isEmpty() || endDateTimeInput.isEmpty()) {
+            throw createInvalidEventFormatException();
         }
-        LocalDateTime from = parseDateTime(fromInput);
-        LocalDateTime to = parseDateTime(toInput);
-        return new Event(description, from, to);
+        LocalDateTime startDateTime = parseDateTime(startDateTimeInput);
+        LocalDateTime endDateTime = parseDateTime(endDateTimeInput);
+        return new Event(description, startDateTime, endDateTime);
     }
 
     /**
@@ -146,7 +152,7 @@ public class Parser {
     /**
      * Creates the standard error for malformed event arguments.
      */
-    private static CrowException invalidEventFormat() {
+    private static CrowException createInvalidEventFormatException() {
         return new CrowException("Error: Use event DESCRIPTION /from d/M/yyyy HHmm /to d/M/yyyy HHmm.");
     }
 }

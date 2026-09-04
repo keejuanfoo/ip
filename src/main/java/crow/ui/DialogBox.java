@@ -19,14 +19,14 @@ import javafx.scene.layout.HBox;
  */
 public class DialogBox extends HBox {
     @FXML
-    private Label dialog;
+    private Label dialogLabel;
     @FXML
-    private ImageView displayPicture;
+    private ImageView avatarImageView;
 
     /**
      * Loads the dialog layout and fills it with a message and profile image.
      */
-    private DialogBox(String text, Image image) {
+    private DialogBox(String message, Image avatarImage) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(
                     MainWindow.class.getResource("/view/DialogBox.fxml"));
@@ -37,33 +37,33 @@ public class DialogBox extends HBox {
             throw new IllegalStateException("Unable to load a dialog box.", e);
         }
 
-        dialog.setText(text);
-        displayPicture.setImage(image);
+        dialogLabel.setText(message);
+        avatarImageView.setImage(avatarImage);
     }
 
     /**
      * Creates a right-aligned dialog for a message sent by the user.
      */
-    public static DialogBox getUserDialog(String text, Image image) {
-        return new DialogBox(text, image);
+    public static DialogBox createUserDialog(String message, Image avatarImage) {
+        return new DialogBox(message, avatarImage);
     }
 
     /**
      * Creates a left-aligned dialog for a response sent by Crow.
      */
-    public static DialogBox getCrowDialog(String text, Image image) {
-        DialogBox dialogBox = new DialogBox(text, image);
-        dialogBox.flip();
+    public static DialogBox createCrowDialog(String message, Image avatarImage) {
+        DialogBox dialogBox = new DialogBox(message, avatarImage);
+        dialogBox.flipAlignment();
         return dialogBox;
     }
 
     /**
      * Places the profile image on the left and the message on the right.
      */
-    private void flip() {
-        ObservableList<Node> children = FXCollections.observableArrayList(getChildren());
-        Collections.reverse(children);
-        getChildren().setAll(children);
+    private void flipAlignment() {
+        ObservableList<Node> dialogElements = FXCollections.observableArrayList(getChildren());
+        Collections.reverse(dialogElements);
+        getChildren().setAll(dialogElements);
         setAlignment(Pos.TOP_LEFT);
     }
 }

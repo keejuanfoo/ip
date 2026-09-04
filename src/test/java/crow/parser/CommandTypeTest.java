@@ -7,15 +7,15 @@ import org.junit.jupiter.api.Test;
 class CommandTypeTest {
     @Test
     void from_knownCommand_isCaseInsensitive() {
-        assertEquals(CommandType.DEADLINE, CommandType.from("deadline"));
-        assertEquals(CommandType.DEADLINE, CommandType.from("dEADline"));
-        assertEquals(CommandType.FIND, CommandType.from("find"));
-        assertEquals(CommandType.BYE, CommandType.from("BYE"));
+        assertEquals(CommandType.DEADLINE, CommandType.parseCommandWord("deadline"));
+        assertEquals(CommandType.DEADLINE, CommandType.parseCommandWord("dEADline"));
+        assertEquals(CommandType.FIND, CommandType.parseCommandWord("find"));
+        assertEquals(CommandType.BYE, CommandType.parseCommandWord("BYE"));
     }
 
     @Test
     void from_unknownCommand_returnsUnknown() {
-        assertEquals(CommandType.UNKNOWN, CommandType.from("blah"));
-        assertEquals(CommandType.UNKNOWN, CommandType.from(""));
+        assertEquals(CommandType.UNKNOWN, CommandType.parseCommandWord("blah"));
+        assertEquals(CommandType.UNKNOWN, CommandType.parseCommandWord(""));
     }
 }
