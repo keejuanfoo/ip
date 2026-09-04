@@ -83,6 +83,14 @@ class StorageTest {
     }
 
     @Test
+    void save_unsupportedTaskType_triggersAssertion() {
+        Storage storage = new Storage(tempDirectory.resolve("crow.txt"));
+
+        assertThrows(AssertionError.class,
+                () -> storage.save(List.of(new Task("unsupported task"))));
+    }
+
+    @Test
     void load_invalidTaskType_throwsException() throws IOException {
         Storage storage = storageContaining("Z | 0 | unknown");
 
