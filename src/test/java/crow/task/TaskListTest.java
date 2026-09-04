@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -80,5 +81,26 @@ class TaskListTest {
         assertThrows(AssertionError.class, () -> taskList.add(null));
         assertThrows(AssertionError.class, () -> taskList.find(" "));
         assertThrows(AssertionError.class, () -> taskList.mark(0));
+    }
+
+    @Test
+    void constructor_mixedTasks_automaticallyGroupsAndSortsTasks() {
+        Todo zooTodo = new Todo("visit zoo");
+        Todo bookTodo = new Todo("borrow book");
+        Deadline laterDeadline = new Deadline("apply permit",
+                LocalDateTime.of(2026, 9, 5, 12, 0));
+        Deadline alphabeticallyLaterDeadline = new Deadline("write report",
+                LocalDateTime.of(2026, 9, 4, 18, 0));
+        Deadline alphabeticallyEarlierDeadline = new Deadline("submit report",
+                LocalDateTime.of(2026, 9, 4, 18, 0));
+        Event laterEvent = new Event("team dinner",
+                LocalDateTime.of(2026, 9, 6, 19, 0), LocalDateTime.of(2026, 9, 6, 21, 0));
+        Event earlierEvent = new Event("team meeting",
+                LocalDateTime.of(2026, 9, 5, 10, 0), LocalDateTime.of(2026, 9, 5, 11, 0));
+        TaskList taskList = new TaskList(List.of(laterEvent, laterDeadline, zooTodo,
+                alphabeticallyLaterDeadline, bookTodo, earlierEvent, alphabeticallyEarlierDeadline));
+
+        assertEquals(List.of(bookTodo, zooTodo, alphabeticallyEarlierDeadline,
+                alphabeticallyLaterDeadline, laterDeadline, earlierEvent, laterEvent), taskList.asList());
     }
 }

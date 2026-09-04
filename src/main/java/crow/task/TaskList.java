@@ -2,13 +2,24 @@ package crow.task;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Stream;
 
 /**
  * Stores tasks and provides operations for managing them.
  */
 public class TaskList {
+    private static final Comparator<Task> DESCRIPTION_COMPARATOR =
+            Comparator.comparing(Task::getDescription, String.CASE_INSENSITIVE_ORDER);
+    private static final Comparator<Deadline> DEADLINE_COMPARATOR =
+            Comparator.comparing(Deadline::getDeadlineDateTime)
+                    .thenComparing(Deadline::getDescription, String.CASE_INSENSITIVE_ORDER);
+    private static final Comparator<Event> EVENT_COMPARATOR =
+            Comparator.comparing(Event::getStartDateTime)
+                    .thenComparing(Event::getDescription, String.CASE_INSENSITIVE_ORDER);
+
     private final ArrayList<Task> tasks;
 
     /**
@@ -27,6 +38,7 @@ public class TaskList {
         assert tasks != null : "Initial task list must not be null";
         assert containsNoNullTasks(tasks) : "Initial task list must not contain null tasks";
         this.tasks = new ArrayList<>(tasks);
+        sortByTypeAndDate();
     }
 
     /**
@@ -37,6 +49,7 @@ public class TaskList {
     public void add(Task task) {
         assert task != null : "Task to add must not be null";
         tasks.add(task);
+        sortByTypeAndDate();
     }
 
     /**
@@ -83,6 +96,35 @@ public class TaskList {
         return tasks.stream()
                 .filter(task -> task.getDescription().toLowerCase(Locale.ROOT).contains(normalizedKeyword))
                 .toList();
+    }
+
+    /**
+     * Groups tasks by type and sorts each group into a predictable order.
+     * ToDos are ordered alphabetically, while dated tasks are ordered by their
+     * date and time followed by their description.
+     */
+    private void sortByTypeAndDate() {
+        Stream<Task> sortedTodos = tasks.stream()
+                .filter(Todo.class::isInstance)
+                .sorted(DESCRIPTION_COMPARATOR);
+        Stream<Task> sortedDeadlines = tasks.stream()
+                .filter(Deadline.class::isInstance)
+                .map(Deadline.class::cast)
+                .sorted(DEADLINE_COMPARATOR)
+                .map(Task.class::cast);
+        Stream<Task> sortedEvents = tasks.stream()
+                .filter(Event.class::isInstance)
+                .map(Event.class::cast)
+                .sorted(EVENT_COMPARATOR)
+                .map(Task.class::cast);
+
+        List<Task> sortedTasks = Stream.of(sortedTodos, sortedDeadlines, sortedEvents)
+                .flatMap(taskStream -> taskStream)
+                .toList();
+        assert sortedTasks.size() == tasks.size() : "Every task must have a supported type";
+
+        tasks.clear();
+        tasks.addAll(sortedTasks);
     }
 
     /**

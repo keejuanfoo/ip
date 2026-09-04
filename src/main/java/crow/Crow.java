@@ -4,8 +4,11 @@ import crow.exception.CrowException;
 import crow.parser.CommandType;
 import crow.parser.Parser;
 import crow.storage.Storage;
+import crow.task.Deadline;
+import crow.task.Event;
 import crow.task.Task;
 import crow.task.TaskList;
+import crow.task.Todo;
 import crow.ui.Ui;
 
 import java.nio.file.Path;
@@ -16,6 +19,7 @@ import java.util.List;
  */
 public class Crow {
     private static final Path DATA_FILE_PATH = Path.of("data", "crow.txt");
+    private static final String TASK_GROUP_SEPARATOR = "-".repeat(20);
 
     private final Ui ui;
     private final Storage storage;
@@ -147,10 +151,35 @@ public class Crow {
 
     private String formatTaskList(String heading, List<Task> tasksToDisplay) {
         StringBuilder responseBuilder = new StringBuilder(heading);
+        String previousTaskGroup = null;
         for (int i = 0; i < tasksToDisplay.size(); i++) {
+            String taskGroup = getTaskGroupName(tasksToDisplay.get(i));
+            if (!taskGroup.equals(previousTaskGroup)) {
+                if (previousTaskGroup != null) {
+                    responseBuilder.append("\n").append(TASK_GROUP_SEPARATOR);
+                }
+                responseBuilder.append("\n").append(taskGroup).append(":");
+                previousTaskGroup = taskGroup;
+            }
             responseBuilder.append("\n").append(i + 1).append(".").append(tasksToDisplay.get(i));
         }
         return responseBuilder.toString();
+    }
+
+    /**
+     * Returns the display heading for a supported task type.
+     */
+    private String getTaskGroupName(Task task) {
+        if (task instanceof Todo) {
+            return "ToDos";
+        }
+        if (task instanceof Deadline) {
+            return "Deadlines";
+        }
+        if (task instanceof Event) {
+            return "Events";
+        }
+        throw new AssertionError("Unsupported task type: " + task.getClass().getName());
     }
 
     /**
