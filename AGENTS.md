@@ -37,6 +37,10 @@ intermediate rules as mandatory for all Java code in this repository.
 
 ## Git
 
+For every proposed or created commit message, read and follow the project skill
+at `.agents/skills/seedu-git-standard/SKILL.md`. Treat its SE-EDU commit-message
+rules as mandatory for all future commits in this repository.
+
 Use lightweight tags unless the user requests an annotated tag.
 When proposing or creating a commit message, include enough detail to explain the rationale for the change.
 Do not commit or push unless explicitly asked.
