@@ -118,11 +118,11 @@ public class Storage {
             }
 
             Task task = switch (taskFields[0]) {
-            case "T" -> new Todo(taskFields[2]);
-            case "D" -> new Deadline(taskFields[2], LocalDateTime.parse(taskFields[3]));
-            case "E" -> new Event(taskFields[2], LocalDateTime.parse(taskFields[3]),
-                    LocalDateTime.parse(taskFields[4]));
-            default -> throw new CrowException("Error: Invalid task type in data file.");
+                case "T" -> new Todo(taskFields[2]);
+                case "D" -> new Deadline(taskFields[2], LocalDateTime.parse(taskFields[3]));
+                case "E" -> new Event(taskFields[2], LocalDateTime.parse(taskFields[3]),
+                        LocalDateTime.parse(taskFields[4]));
+                default -> throw new CrowException("Error: Invalid task type in data file.");
             };
             if (taskFields[1].equals("1")) {
                 task.markAsDone();
@@ -141,10 +141,10 @@ public class Storage {
      */
     private void validateFieldCount(String[] taskFields) throws CrowException {
         int expectedFieldCount = switch (taskFields[0]) {
-        case "T" -> 3;
-        case "D" -> 4;
-        case "E" -> 5;
-        default -> throw new CrowException("Error: Invalid task type in data file.");
+            case "T" -> 3;
+            case "D" -> 4;
+            case "E" -> 5;
+            default -> throw new CrowException("Error: Invalid task type in data file.");
         };
         if (taskFields.length != expectedFieldCount) {
             throw createInvalidTaskDataException();
@@ -155,7 +155,9 @@ public class Storage {
      * Ensures a task can be represented safely in the storage format.
      */
     private void validateTaskForStorage(Task task) throws CrowException {
-        boolean isSupportedType = task instanceof Todo || task instanceof Deadline || task instanceof Event;
+        boolean isSupportedType = task instanceof Todo
+                || task instanceof Deadline
+                || task instanceof Event;
         if (!isSupportedType || task.getDescription().isBlank() || task.getDescription().contains("|")) {
             throw new CrowException("Error: Unable to save invalid task data.");
         }

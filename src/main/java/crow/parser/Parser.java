@@ -16,9 +16,12 @@ import java.util.regex.Pattern;
  * Interprets user input and converts command arguments into program data.
  */
 public class Parser {
-    private static final Pattern DEADLINE_SEPARATOR = Pattern.compile("\\s+/by\\s+", Pattern.CASE_INSENSITIVE);
-    private static final Pattern EVENT_START_SEPARATOR = Pattern.compile("\\s+/from\\s+", Pattern.CASE_INSENSITIVE);
-    private static final Pattern EVENT_END_SEPARATOR = Pattern.compile("\\s+/to\\s+", Pattern.CASE_INSENSITIVE);
+    private static final Pattern DEADLINE_SEPARATOR = Pattern.compile(
+            "\\s+/by\\s+", Pattern.CASE_INSENSITIVE);
+    private static final Pattern EVENT_START_SEPARATOR = Pattern.compile(
+            "\\s+/from\\s+", Pattern.CASE_INSENSITIVE);
+    private static final Pattern EVENT_END_SEPARATOR = Pattern.compile(
+            "\\s+/to\\s+", Pattern.CASE_INSENSITIVE);
     private static final DateTimeFormatter INPUT_DATE_TIME_FORMAT =
             DateTimeFormatter.ofPattern("d/M/uuuu HHmm").withResolverStyle(ResolverStyle.STRICT);
 
@@ -119,7 +122,9 @@ public class Parser {
         }
 
         String description = parseDescription(trimmedArguments.substring(0, descriptionEndIndex), "Event");
-        String startDateTimeInput = trimmedArguments.substring(startDateTimeIndex, startDateTimeEndIndex).trim();
+        String startDateTimeInput = trimmedArguments
+                .substring(startDateTimeIndex, startDateTimeEndIndex)
+                .trim();
         String endDateTimeInput = trimmedArguments.substring(endDateTimeStartIndex).trim();
         if (startDateTimeInput.isEmpty() || endDateTimeInput.isEmpty()) {
             throw createInvalidEventFormatException();
@@ -156,7 +161,8 @@ public class Parser {
      */
     public static void validateNoArguments(String arguments, String commandName) throws CrowException {
         if (!arguments.isBlank()) {
-            throw new CrowException("Error: " + commandName + " does not accept parameters.");
+            throw new CrowException(
+                    "Error: " + commandName + " does not accept parameters.");
         }
     }
 
