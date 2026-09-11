@@ -2,21 +2,23 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<fx:root alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308"
-         maxWidth="1.7976931348623157E308" prefWidth="400.0"
+<fx:root maxWidth="1.7976931348623157E308" styleClass="message-row"
          type="javafx.scene.layout.HBox"
          xmlns="http://javafx.com/javafx/17"
          xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <Label fx:id="dialogLabel" minHeight="-Infinity" wrapText="true"
-               HBox.hgrow="ALWAYS" />
-        <ImageView fx:id="avatarImageView" fitHeight="72.0" fitWidth="72.0"
-                   pickOnBounds="true" preserveRatio="true" />
+        <VBox spacing="6.0" styleClass="message-content" HBox.hgrow="ALWAYS">
+            <children>
+                <Label fx:id="senderLabel" styleClass="sender-label" />
+                <Label fx:id="messageLabel" maxWidth="1.7976931348623157E308"
+                       styleClass="message-label" wrapText="true" />
+            </children>
+        </VBox>
     </children>
     <padding>
-        <Insets bottom="12.0" left="8.0" right="8.0" top="12.0" />
+        <Insets bottom="18.0" left="24.0" right="24.0" top="18.0" />
     </padding>
 </fx:root>

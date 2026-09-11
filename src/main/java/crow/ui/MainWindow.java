@@ -8,18 +8,12 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 
 /**
  * Controls Crow's main JavaFX window.
  */
 public class MainWindow {
-    private final Image userImage = new Image(
-            this.getClass().getResourceAsStream("/images/DaUser.png"));
-    private final Image crowImage = new Image(
-            this.getClass().getResourceAsStream("/images/DaCrow.png"));
-
     @FXML
     private ScrollPane scrollPane;
     @FXML
@@ -54,8 +48,8 @@ public class MainWindow {
         String userCommand = userInputField.getText();
         String crowResponse = crow.getResponse(userCommand);
         dialogContainer.getChildren().addAll(
-                DialogBox.createUserDialog(userCommand, userImage),
-                DialogBox.createCrowDialog(crowResponse, crowImage));
+                DialogBox.createUserDialog(userCommand),
+                DialogBox.createCrowDialog(crowResponse));
         userInputField.clear();
 
         if (isExitCommand(userCommand)) {
