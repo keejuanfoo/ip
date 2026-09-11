@@ -76,12 +76,11 @@ public class Crow {
 
         while (ui.hasNextCommand()) {
             String input = ui.readCommand();
-            CommandType commandType = Parser.parseCommandType(input);
             ui.showSeparator();
             ui.showResponse(getResponse(input));
             ui.showSeparator();
 
-            if (commandType == CommandType.BYE) {
+            if (Parser.isExitCommand(input)) {
                 return;
             }
         }
@@ -99,7 +98,7 @@ public class Crow {
 
         try {
             return switch (commandType) {
-            case LIST -> formatTaskList("Here are the tasks in your list:", taskList.asList());
+            case LIST -> listTasks(commandArguments);
             case FIND -> formatTaskList("Here are the matching tasks in your list:",
                     taskList.find(Parser.parseFindKeyword(commandArguments)));
             case MARK -> markTask(commandArguments);
@@ -108,7 +107,7 @@ public class Crow {
             case TODO -> addTask(Parser.parseTodo(commandArguments));
             case DEADLINE -> addTask(Parser.parseDeadline(commandArguments));
             case EVENT -> addTask(Parser.parseEvent(commandArguments));
-            case BYE -> "Bye. Hope to see you again soon!";
+            case BYE -> exit(commandArguments);
             case UNKNOWN -> throw new CrowException("Error: Unknown command.");
             default -> throw new AssertionError("Unhandled command type: " + commandType);
             };
@@ -122,6 +121,16 @@ public class Crow {
         taskList.mark(taskIndex);
         storage.save(taskList.asList());
         return "Nice! I've marked this task as done:\n  " + taskList.get(taskIndex);
+    }
+
+    private String listTasks(String commandArguments) throws CrowException {
+        Parser.validateNoArguments(commandArguments, "list");
+        return formatTaskList("Here are the tasks in your list:", taskList.asList());
+    }
+
+    private String exit(String commandArguments) throws CrowException {
+        Parser.validateNoArguments(commandArguments, "bye");
+        return "Bye. Hope to see you again soon!";
     }
 
     private String unmarkTask(String commandArguments) throws CrowException {
@@ -139,6 +148,9 @@ public class Crow {
     }
 
     private String addTask(Task task) throws CrowException {
+        if (taskList.containsTaskWithSameDetails(task)) {
+            throw new CrowException("Error: This task already exists.");
+        }
         taskList.add(task);
         storage.save(taskList.asList());
         return "Got it. I've added this task:\n  " + task + "\n" + formatTaskCount();

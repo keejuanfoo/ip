@@ -1,7 +1,6 @@
 package crow.ui;
 
 import crow.Crow;
-import crow.parser.CommandType;
 import crow.parser.Parser;
 
 import javafx.application.Platform;
@@ -64,6 +63,6 @@ public class MainWindow {
      * @return {@code true} when the command is {@code bye}.
      */
     private static boolean isExitCommand(String command) {
-        return Parser.parseCommandType(command) == CommandType.BYE;
+        return Parser.isExitCommand(command);
     }
 }

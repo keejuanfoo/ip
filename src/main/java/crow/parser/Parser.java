@@ -9,14 +9,16 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Interprets user input and converts command arguments into program data.
  */
 public class Parser {
-    private static final String DEADLINE_SEPARATOR = " /by ";
-    private static final String EVENT_START_SEPARATOR = " /from ";
-    private static final String EVENT_END_SEPARATOR = " /to ";
+    private static final Pattern DEADLINE_SEPARATOR = Pattern.compile("\\s+/by\\s+", Pattern.CASE_INSENSITIVE);
+    private static final Pattern EVENT_START_SEPARATOR = Pattern.compile("\\s+/from\\s+", Pattern.CASE_INSENSITIVE);
+    private static final Pattern EVENT_END_SEPARATOR = Pattern.compile("\\s+/to\\s+", Pattern.CASE_INSENSITIVE);
     private static final DateTimeFormatter INPUT_DATE_TIME_FORMAT =
             DateTimeFormatter.ofPattern("d/M/uuuu HHmm").withResolverStyle(ResolverStyle.STRICT);
 
@@ -43,6 +45,13 @@ public class Parser {
     }
 
     /**
+     * Checks whether an input is a valid command to exit the application.
+     */
+    public static boolean isExitCommand(String input) {
+        return parseCommandType(input) == CommandType.BYE && parseArguments(input).isEmpty();
+    }
+
+    /**
      * Creates a todo from its command arguments.
      *
      * @param arguments Todo description.
@@ -50,10 +59,7 @@ public class Parser {
      * @throws CrowException If the description is empty.
      */
     public static Todo parseTodo(String arguments) throws CrowException {
-        if (arguments.isEmpty()) {
-            throw new CrowException("Error: Todo description cannot be empty.");
-        }
-        return new Todo(arguments);
+        return new Todo(parseDescription(arguments, "Todo"));
     }
 
     /**
@@ -64,13 +70,22 @@ public class Parser {
      * @throws CrowException If the arguments are incomplete or invalid.
      */
     public static Deadline parseDeadline(String arguments) throws CrowException {
-        int deadlineSeparatorIndex = arguments.indexOf(DEADLINE_SEPARATOR);
-        int dateTimeStartIndex = deadlineSeparatorIndex + DEADLINE_SEPARATOR.length();
-        if (deadlineSeparatorIndex <= 0 || arguments.substring(dateTimeStartIndex).trim().isEmpty()) {
+        Matcher separatorMatcher = DEADLINE_SEPARATOR.matcher(arguments.trim());
+        if (!separatorMatcher.find()) {
             throw new CrowException("Error: Use deadline DESCRIPTION /by d/M/yyyy HHmm.");
         }
-        String description = arguments.substring(0, deadlineSeparatorIndex).trim();
-        LocalDateTime deadlineDateTime = parseDateTime(arguments.substring(dateTimeStartIndex).trim());
+        int descriptionEndIndex = separatorMatcher.start();
+        int dateTimeStartIndex = separatorMatcher.end();
+        if (separatorMatcher.find()) {
+            throw new CrowException("Error: A deadline must contain exactly one /by parameter.");
+        }
+
+        String description = parseDescription(arguments.substring(0, descriptionEndIndex), "Deadline");
+        String dateTimeInput = arguments.substring(dateTimeStartIndex).trim();
+        if (dateTimeInput.isEmpty()) {
+            throw new CrowException("Error: Use deadline DESCRIPTION /by d/M/yyyy HHmm.");
+        }
+        LocalDateTime deadlineDateTime = parseDateTime(dateTimeInput);
         return new Deadline(description, deadlineDateTime);
     }
 
@@ -82,25 +97,38 @@ public class Parser {
      * @throws CrowException If the arguments are incomplete or invalid.
      */
     public static Event parseEvent(String arguments) throws CrowException {
-        int startSeparatorIndex = arguments.indexOf(EVENT_START_SEPARATOR);
-        if (startSeparatorIndex <= 0) {
+        String trimmedArguments = arguments.trim();
+        Matcher startMatcher = EVENT_START_SEPARATOR.matcher(trimmedArguments);
+        if (!startMatcher.find()) {
             throw createInvalidEventFormatException();
         }
-        int startDateTimeIndex = startSeparatorIndex + EVENT_START_SEPARATOR.length();
-        int endSeparatorIndex = arguments.indexOf(EVENT_END_SEPARATOR, startDateTimeIndex);
-        if (endSeparatorIndex < 0) {
-            throw createInvalidEventFormatException();
+        int descriptionEndIndex = startMatcher.start();
+        int startDateTimeIndex = startMatcher.end();
+        if (startMatcher.find()) {
+            throw new CrowException("Error: An event must contain exactly one /from parameter.");
         }
 
-        String description = arguments.substring(0, startSeparatorIndex).trim();
-        String startDateTimeInput = arguments.substring(startDateTimeIndex, endSeparatorIndex).trim();
-        String endDateTimeInput = arguments.substring(
-                endSeparatorIndex + EVENT_END_SEPARATOR.length()).trim();
+        Matcher endMatcher = EVENT_END_SEPARATOR.matcher(trimmedArguments);
+        if (!endMatcher.find() || endMatcher.start() < startDateTimeIndex) {
+            throw createInvalidEventFormatException();
+        }
+        int startDateTimeEndIndex = endMatcher.start();
+        int endDateTimeStartIndex = endMatcher.end();
+        if (endMatcher.find()) {
+            throw new CrowException("Error: An event must contain exactly one /to parameter.");
+        }
+
+        String description = parseDescription(trimmedArguments.substring(0, descriptionEndIndex), "Event");
+        String startDateTimeInput = trimmedArguments.substring(startDateTimeIndex, startDateTimeEndIndex).trim();
+        String endDateTimeInput = trimmedArguments.substring(endDateTimeStartIndex).trim();
         if (startDateTimeInput.isEmpty() || endDateTimeInput.isEmpty()) {
             throw createInvalidEventFormatException();
         }
         LocalDateTime startDateTime = parseDateTime(startDateTimeInput);
         LocalDateTime endDateTime = parseDateTime(endDateTimeInput);
+        if (!startDateTime.isBefore(endDateTime)) {
+            throw new CrowException("Error: Event start must be before its end.");
+        }
         return new Event(description, startDateTime, endDateTime);
     }
 
@@ -112,10 +140,24 @@ public class Parser {
      * @throws CrowException If the keyword is empty.
      */
     public static String parseFindKeyword(String arguments) throws CrowException {
-        if (arguments.isEmpty()) {
+        String keyword = normalizeWhitespace(arguments);
+        if (keyword.isEmpty()) {
             throw new CrowException("Error: Search keyword cannot be empty.");
         }
-        return arguments;
+        return keyword;
+    }
+
+    /**
+     * Ensures that a command that takes no parameters has none.
+     *
+     * @param arguments Text following the command word.
+     * @param commandName Name shown in an error message.
+     * @throws CrowException If unexpected parameters are present.
+     */
+    public static void validateNoArguments(String arguments, String commandName) throws CrowException {
+        if (!arguments.isBlank()) {
+            throw new CrowException("Error: " + commandName + " does not accept parameters.");
+        }
     }
 
     /**
@@ -143,7 +185,7 @@ public class Parser {
      */
     private static LocalDateTime parseDateTime(String input) throws CrowException {
         try {
-            return LocalDateTime.parse(input, INPUT_DATE_TIME_FORMAT);
+            return LocalDateTime.parse(normalizeWhitespace(input), INPUT_DATE_TIME_FORMAT);
         } catch (DateTimeParseException e) {
             throw new CrowException("Error: Date and time must use d/M/yyyy HHmm format.");
         }
@@ -154,5 +196,26 @@ public class Parser {
      */
     private static CrowException createInvalidEventFormatException() {
         return new CrowException("Error: Use event DESCRIPTION /from d/M/yyyy HHmm /to d/M/yyyy HHmm.");
+    }
+
+    /**
+     * Validates and normalizes a task description.
+     */
+    private static String parseDescription(String input, String taskType) throws CrowException {
+        String description = normalizeWhitespace(input);
+        if (description.isEmpty()) {
+            throw new CrowException("Error: " + taskType + " description cannot be empty.");
+        }
+        if (description.contains("|")) {
+            throw new CrowException("Error: Task descriptions cannot contain '|'.");
+        }
+        return description;
+    }
+
+    /**
+     * Trims text and replaces consecutive whitespace with one space.
+     */
+    private static String normalizeWhitespace(String input) {
+        return input.trim().replaceAll("\\s+", " ");
     }
 }

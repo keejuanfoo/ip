@@ -49,6 +49,18 @@ class CrowTest {
 
         assertEquals("Error: Unknown command.", crow.getResponse("blah"));
         assertEquals("Error: Todo description cannot be empty.", crow.getResponse("todo"));
+        assertEquals("Error: list does not accept parameters.", crow.getResponse("list extra"));
+        assertEquals("Error: bye does not accept parameters.", crow.getResponse("bye now"));
+    }
+
+    @Test
+    void getResponse_duplicateTask_returnsErrorWithoutAddingTask() {
+        Crow crow = new Crow(tempDirectory.resolve("crow.txt"));
+        crow.getResponse("todo read book");
+
+        assertEquals("Error: This task already exists.", crow.getResponse("todo READ   BOOK"));
+        assertTrue(crow.getResponse("list").contains("1.[T][ ] read book"));
+        assertFalse(crow.getResponse("list").contains("2.[T]"));
     }
 
     @Test

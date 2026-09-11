@@ -99,6 +99,14 @@ public class TaskList {
     }
 
     /**
+     * Checks whether a task with the same type and identifying details exists.
+     */
+    public boolean containsTaskWithSameDetails(Task task) {
+        assert task != null : "Task to compare must not be null";
+        return tasks.stream().anyMatch(existingTask -> existingTask.hasSameDetailsAs(task));
+    }
+
+    /**
      * Groups tasks by type and sorts each group into a predictable order.
      * ToDos are ordered alphabetically, while dated tasks are ordered by their
      * date and time followed by their description.

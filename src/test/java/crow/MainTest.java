@@ -1,6 +1,7 @@
 package crow;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Method;
@@ -55,6 +56,7 @@ class MainTest {
 
         assertTrue((boolean) isExitCommand.invoke(null, "bye"));
         assertTrue((boolean) isExitCommand.invoke(null, "  BYE  "));
+        assertFalse((boolean) isExitCommand.invoke(null, "bye now"));
     }
 
     @Test

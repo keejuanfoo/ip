@@ -28,7 +28,7 @@ class ParserTest {
 
     @Test
     void parseTodo_validDescription_createsTodo() throws CrowException {
-        Todo todo = Parser.parseTodo("read book");
+        Todo todo = Parser.parseTodo("  read    book  ");
 
         assertEquals("read book", todo.getDescription());
     }
@@ -42,7 +42,7 @@ class ParserTest {
 
     @Test
     void parseDeadline_validArguments_createsDeadline() throws CrowException {
-        Deadline deadline = Parser.parseDeadline("return book /by 2/12/2019 1800");
+        Deadline deadline = Parser.parseDeadline("return   book   /BY   2/12/2019   1800");
 
         assertEquals("return book", deadline.getDescription());
         assertEquals(LocalDateTime.of(2019, 12, 2, 18, 0), deadline.getDeadlineDateTime());
@@ -57,11 +57,13 @@ class ParserTest {
     @Test
     void parseDeadline_missingBy_throwsException() {
         assertThrows(CrowException.class, () -> Parser.parseDeadline("return book"));
+        assertThrows(CrowException.class,
+                () -> Parser.parseDeadline("return book /by 2/12/2019 1800 /by 3/12/2019 1800"));
     }
 
     @Test
     void parseEvent_validArguments_createsEvent() throws CrowException {
-        Event event = Parser.parseEvent("meeting /from 3/12/2019 1400 /to 3/12/2019 1600");
+        Event event = Parser.parseEvent("meeting   /FROM  3/12/2019  1400   /TO  3/12/2019  1600");
 
         assertEquals("meeting", event.getDescription());
         assertEquals(LocalDateTime.of(2019, 12, 3, 14, 0), event.getStartDateTime());
@@ -72,6 +74,25 @@ class ParserTest {
     void parseEvent_missingRange_throwsException() {
         assertThrows(CrowException.class, () -> Parser.parseEvent("meeting /from 3/12/2019 1400"));
         assertThrows(CrowException.class, () -> Parser.parseEvent("meeting /to 3/12/2019 1600"));
+        assertThrows(CrowException.class, () -> Parser.parseEvent(
+                "meeting /from 3/12/2019 1400 /from 3/12/2019 1500 /to 3/12/2019 1600"));
+        assertThrows(CrowException.class, () -> Parser.parseEvent(
+                "meeting /from 3/12/2019 1400 /to 3/12/2019 1600 /to 3/12/2019 1700"));
+    }
+
+    @Test
+    void parseEvent_nonIncreasingTimes_throwsException() {
+        assertThrows(CrowException.class,
+                () -> Parser.parseEvent("meeting /from 3/12/2019 1600 /to 3/12/2019 1600"));
+        assertThrows(CrowException.class,
+                () -> Parser.parseEvent("meeting /from 3/12/2019 1700 /to 3/12/2019 1600"));
+    }
+
+    @Test
+    void parseTaskDescription_storageDelimiter_throwsException() {
+        assertThrows(CrowException.class, () -> Parser.parseTodo("read | book"));
+        assertThrows(CrowException.class,
+                () -> Parser.parseDeadline("return | book /by 2/12/2019 1800"));
     }
 
     @Test

@@ -29,6 +29,12 @@ public class Deadline extends Task {
     }
 
     @Override
+    public boolean hasSameDetailsAs(Task other) {
+        return super.hasSameDetailsAs(other)
+                && deadlineDateTime.equals(((Deadline) other).deadlineDateTime);
+    }
+
+    @Override
     public String toString() {
         return "[D]" + super.toString()
                 + " (by: " + deadlineDateTime.format(DISPLAY_DATE_TIME_FORMAT) + ")";
