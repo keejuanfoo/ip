@@ -41,6 +41,13 @@ public class Event extends Task {
     }
 
     @Override
+    public boolean hasSameDetailsAs(Task other) {
+        return super.hasSameDetailsAs(other)
+                && startDateTime.equals(((Event) other).startDateTime)
+                && endDateTime.equals(((Event) other).endDateTime);
+    }
+
+    @Override
     public String toString() {
         return "[E]" + super.toString()
                 + " (from: " + startDateTime.format(DISPLAY_DATE_TIME_FORMAT)

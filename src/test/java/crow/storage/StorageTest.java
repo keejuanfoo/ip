@@ -36,6 +36,15 @@ class StorageTest {
     }
 
     @Test
+    void load_pathIsDirectory_throwsReadableException() {
+        Storage storage = new Storage(tempDirectory);
+
+        CrowException exception = assertThrows(CrowException.class, storage::load);
+
+        assertEquals("Error: Unable to read saved tasks.", exception.getMessage());
+    }
+
+    @Test
     void save_missingDirectory_createsDirectoryAndFile() throws CrowException, IOException {
         Path filePath = tempDirectory.resolve("data").resolve("crow.txt");
         Storage storage = new Storage(filePath);
@@ -47,6 +56,18 @@ class StorageTest {
         assertTrue(Files.exists(filePath));
         assertEquals(List.of("T | 1 | read book"),
                 Files.readAllLines(filePath, StandardCharsets.UTF_8));
+    }
+
+    @Test
+    void save_parentPathIsFile_throwsReadableException() throws IOException {
+        Path parentFile = tempDirectory.resolve("not-a-directory");
+        Files.writeString(parentFile, "content", StandardCharsets.UTF_8);
+        Storage storage = new Storage(parentFile.resolve("crow.txt"));
+
+        CrowException exception = assertThrows(CrowException.class,
+                () -> storage.save(List.of(new Todo("read book"))));
+
+        assertEquals("Error: Unable to save tasks.", exception.getMessage());
     }
 
     @Test
@@ -83,11 +104,13 @@ class StorageTest {
     }
 
     @Test
-    void save_unsupportedTaskType_triggersAssertion() {
+    void save_unsupportedTaskType_throwsException() {
         Storage storage = new Storage(tempDirectory.resolve("crow.txt"));
 
-        assertThrows(AssertionError.class,
+        CrowException exception = assertThrows(CrowException.class,
                 () -> storage.save(List.of(new Task("unsupported task"))));
+
+        assertEquals("Error: Unable to save invalid task data.", exception.getMessage());
     }
 
     @Test
@@ -112,9 +135,23 @@ class StorageTest {
     void load_incompleteOrInvalidDateData_throwsException() throws IOException {
         Storage incompleteStorage = storageContaining("D | 0 | return book");
         Storage invalidDateStorage = storageContaining("D | 0 | return book | Friday");
+        Storage extraFieldsStorage = storageContaining("T | 0 | read book | unexpected");
+        Storage invalidEventRangeStorage = storageContaining(
+                "E | 0 | meeting | 2019-12-03T16:00 | 2019-12-03T14:00");
 
         assertThrows(CrowException.class, incompleteStorage::load);
         assertThrows(CrowException.class, invalidDateStorage::load);
+        assertThrows(CrowException.class, extraFieldsStorage::load);
+        assertThrows(CrowException.class, invalidEventRangeStorage::load);
+    }
+
+    @Test
+    void load_duplicateTasks_throwsException() throws IOException {
+        Storage storage = storageContaining("T | 0 | read book\nT | 1 | READ BOOK");
+
+        CrowException exception = assertThrows(CrowException.class, storage::load);
+
+        assertEquals("Error: Duplicate task in data file.", exception.getMessage());
     }
 
     private Storage storageContaining(String content) throws IOException {
