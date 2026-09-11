@@ -21,7 +21,7 @@ class TaskListTest {
         TaskList taskList = new TaskList(initialTasks);
         initialTasks.clear();
 
-        assertEquals(1, taskList.size());
+        assertEquals(1, taskList.getTaskCount());
         assertSame(todo, taskList.get(0));
     }
 
@@ -31,7 +31,7 @@ class TaskListTest {
         Todo todo = new Todo("read book");
 
         taskList.add(todo);
-        assertEquals(1, taskList.size());
+        assertEquals(1, taskList.getTaskCount());
 
         taskList.mark(0);
         assertTrue(todo.isDone());
@@ -40,16 +40,16 @@ class TaskListTest {
         assertFalse(todo.isDone());
 
         assertSame(todo, taskList.delete(0));
-        assertEquals(0, taskList.size());
+        assertEquals(0, taskList.getTaskCount());
     }
 
     @Test
-    void asList_cannotBeModifiedByCaller() {
+    void getTasks_resultCannotBeModifiedByCaller() {
         TaskList taskList = new TaskList();
         taskList.add(new Todo("read book"));
 
         assertThrows(UnsupportedOperationException.class,
-                () -> taskList.asList().add(new Todo("return book")));
+                () -> taskList.getTasks().add(new Todo("return book")));
     }
 
     @Test
@@ -101,6 +101,6 @@ class TaskListTest {
                 alphabeticallyLaterDeadline, bookTodo, earlierEvent, alphabeticallyEarlierDeadline));
 
         assertEquals(List.of(bookTodo, zooTodo, alphabeticallyEarlierDeadline,
-                alphabeticallyLaterDeadline, laterDeadline, earlierEvent, laterEvent), taskList.asList());
+                alphabeticallyLaterDeadline, laterDeadline, earlierEvent, laterEvent), taskList.getTasks());
     }
 }

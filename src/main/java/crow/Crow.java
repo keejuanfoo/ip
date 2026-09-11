@@ -98,18 +98,18 @@ public class Crow {
 
         try {
             return switch (commandType) {
-            case LIST -> listTasks(commandArguments);
-            case FIND -> formatTaskList("Here are the matching tasks in your list:",
-                    taskList.find(Parser.parseFindKeyword(commandArguments)));
-            case MARK -> markTask(commandArguments);
-            case UNMARK -> unmarkTask(commandArguments);
-            case DELETE -> deleteTask(commandArguments);
-            case TODO -> addTask(Parser.parseTodo(commandArguments));
-            case DEADLINE -> addTask(Parser.parseDeadline(commandArguments));
-            case EVENT -> addTask(Parser.parseEvent(commandArguments));
-            case BYE -> exit(commandArguments);
-            case UNKNOWN -> throw new CrowException("Error: Unknown command.");
-            default -> throw new AssertionError("Unhandled command type: " + commandType);
+                case LIST -> listTasks(commandArguments);
+                case FIND -> formatTaskList("Here are the matching tasks in your list:",
+                        taskList.find(Parser.parseFindKeyword(commandArguments)));
+                case MARK -> markTask(commandArguments);
+                case UNMARK -> unmarkTask(commandArguments);
+                case DELETE -> deleteTask(commandArguments);
+                case TODO -> addTask(Parser.parseTodo(commandArguments));
+                case DEADLINE -> addTask(Parser.parseDeadline(commandArguments));
+                case EVENT -> addTask(Parser.parseEvent(commandArguments));
+                case BYE -> exit(commandArguments);
+                case UNKNOWN -> throw new CrowException("Error: Unknown command.");
+                default -> throw new AssertionError("Unhandled command type: " + commandType);
             };
         } catch (CrowException e) {
             return e.getMessage();
@@ -117,15 +117,15 @@ public class Crow {
     }
 
     private String markTask(String commandArguments) throws CrowException {
-        int taskIndex = Parser.parseTaskIndex(commandArguments, taskList.size());
+        int taskIndex = Parser.parseTaskIndex(commandArguments, taskList.getTaskCount());
         taskList.mark(taskIndex);
-        storage.save(taskList.asList());
+        storage.save(taskList.getTasks());
         return "Nice! I've marked this task as done:\n  " + taskList.get(taskIndex);
     }
 
     private String listTasks(String commandArguments) throws CrowException {
         Parser.validateNoArguments(commandArguments, "list");
-        return formatTaskList("Here are the tasks in your list:", taskList.asList());
+        return formatTaskList("Here are the tasks in your list:", taskList.getTasks());
     }
 
     private String exit(String commandArguments) throws CrowException {
@@ -134,16 +134,16 @@ public class Crow {
     }
 
     private String unmarkTask(String commandArguments) throws CrowException {
-        int taskIndex = Parser.parseTaskIndex(commandArguments, taskList.size());
+        int taskIndex = Parser.parseTaskIndex(commandArguments, taskList.getTaskCount());
         taskList.unmark(taskIndex);
-        storage.save(taskList.asList());
+        storage.save(taskList.getTasks());
         return "OK, I've marked this task as not done yet:\n  " + taskList.get(taskIndex);
     }
 
     private String deleteTask(String commandArguments) throws CrowException {
-        int taskIndex = Parser.parseTaskIndex(commandArguments, taskList.size());
+        int taskIndex = Parser.parseTaskIndex(commandArguments, taskList.getTaskCount());
         Task removedTask = taskList.delete(taskIndex);
-        storage.save(taskList.asList());
+        storage.save(taskList.getTasks());
         return "Noted. I've removed this task:\n  " + removedTask + "\n" + formatTaskCount();
     }
 
@@ -152,13 +152,13 @@ public class Crow {
             throw new CrowException("Error: This task already exists.");
         }
         taskList.add(task);
-        storage.save(taskList.asList());
+        storage.save(taskList.getTasks());
         return "Got it. I've added this task:\n  " + task + "\n" + formatTaskCount();
     }
 
     private String formatTaskCount() {
-        String taskWord = taskList.size() == 1 ? "task" : "tasks";
-        return "Now you have " + taskList.size() + " " + taskWord + " in the list.";
+        String taskWord = taskList.getTaskCount() == 1 ? "task" : "tasks";
+        return "Now you have " + taskList.getTaskCount() + " " + taskWord + " in the list.";
     }
 
     private String formatTaskList(String heading, List<Task> tasksToDisplay) {

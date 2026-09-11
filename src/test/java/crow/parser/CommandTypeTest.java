@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 class CommandTypeTest {
     @Test
-    void from_knownCommand_isCaseInsensitive() {
+    void parseCommandWord_knownCommand_isCaseInsensitive() {
         assertEquals(CommandType.DEADLINE, CommandType.parseCommandWord("deadline"));
         assertEquals(CommandType.DEADLINE, CommandType.parseCommandWord("dEADline"));
         assertEquals(CommandType.FIND, CommandType.parseCommandWord("find"));
@@ -14,7 +14,7 @@ class CommandTypeTest {
     }
 
     @Test
-    void from_unknownCommand_returnsUnknown() {
+    void parseCommandWord_unknownCommand_returnsUnknown() {
         assertEquals(CommandType.UNKNOWN, CommandType.parseCommandWord("blah"));
         assertEquals(CommandType.UNKNOWN, CommandType.parseCommandWord(""));
     }
